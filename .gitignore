@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyc
+
+# Logs
+*.log
+*.log.*
+
+# Database
+*.asvc
+*.db
+*.mdb
+
+# Sockets and runtime files
+*.sock
+*.serial
+comms/
+
+# Backup files
+*.bkp
+*.zip
+
+# Environment
+*.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Sensitive data
+mmu_vars.cfg
+moonraker.asvc
+.moonraker.uuid
