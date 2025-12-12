@@ -59,6 +59,11 @@ class AHT10:
 
     def get_report_time_delta(self):
         return self.report_time
+    
+    def get_temp(self, eventtime):
+        # For heater control - return cached temperature immediately
+        # No blocking I2C read here - background timer updates it
+        return self.temp, 0.
 
     def _make_measurement(self):
         if not self.init_sent:
