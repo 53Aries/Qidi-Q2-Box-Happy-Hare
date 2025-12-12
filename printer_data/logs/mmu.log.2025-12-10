@@ -1,0 +1,951 @@
+00:00:18     TRACE: Processing idle_timeout 'ready' event
+00:00:25     TRACE: Processing idle_timeout 'printing' event
+00:00:25     TRACE: Processing idle_timeout 'ready' event
+00:01:29     TRACE: Processing idle_timeout 'printing' event
+00:01:37     TRACE: MmuSyncFeedbackManager: Sync direction changed from static to extrude
+00:01:42     TRACE: Processing idle_timeout 'ready' event
+00:02:45     TRACE: Processing idle_timeout 'printing' event
+00:02:52     TRACE: Processing idle_timeout 'ready' event
+00:03:36     TRACE: Processing idle_timeout 'printing' event
+00:03:38   DEBUG: Klipper disconnected!
+00:03:55 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+00:03:55   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+00:03:55   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+00:03:56   DEBUG: Loaded saved bowden lengths: [766.7, 766.7, 766.7, 766.7]
+00:03:56   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+00:03:56   DEBUG: Loading persisted MMU state
+00:03:56     TRACE: Setting gear motor rotation distance: 13.6000
+00:03:59 > __MMU_BOOTUP
+00:03:59 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+00:03:59   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+00:03:59     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+00:03:59 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\*/|------------ T0
+00:03:59 [T0] > (*) >>>>>>>>>> (*) >> [Ex >>> Nz] LOADED 0.0mm
+00:03:59     TRACE: Processing idle_timeout 'printing' event
+00:03:59   DEBUG: MmuSyncFeedbackManager: Synced MMU to extruder
+00:04:00     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+00:04:00 > MMU_STATS COUNTER=mmu_restarts INCR=1
+00:04:00     TRACE: Processing idle_timeout 'ready' event
+00:04:16     TRACE: Processing idle_timeout 'printing' event
+00:05:22     TRACE: Processing idle_timeout 'ready' event
+00:05:30     TRACE: Processing idle_timeout 'printing' event
+00:06:18     TRACE: MmuSyncFeedbackManager: Sync direction changed from static to extrude
+00:06:23     TRACE: Processing idle_timeout 'ready' event
+00:06:29     TRACE: Processing idle_timeout 'printing' event
+00:06:37     TRACE: Processing idle_timeout 'ready' event
+00:07:33     TRACE: Processing idle_timeout 'printing' event
+00:07:41     TRACE: Processing idle_timeout 'ready' event
+00:07:46     TRACE: Processing idle_timeout 'printing' event
+00:07:54     TRACE: Processing idle_timeout 'ready' event
+00:08:00     TRACE: Processing idle_timeout 'printing' event
+00:08:08     TRACE: Processing idle_timeout 'ready' event
+00:09:12     TRACE: Processing idle_timeout 'printing' event
+00:09:17     TRACE: Processing idle_timeout 'ready' event
+00:09:45     TRACE: Processing idle_timeout 'printing' event
+00:09:46     TRACE: Processing idle_timeout 'ready' event
+00:10:09     TRACE: Processing idle_timeout 'printing' event
+00:10:13     TRACE: Processing idle_timeout 'ready' event
+00:10:30     TRACE: Processing idle_timeout 'printing' event
+00:11:13     TRACE: Processing idle_timeout 'ready' event
+00:12:14     TRACE: Processing idle_timeout 'printing' event
+00:12:15     TRACE: Processing idle_timeout 'ready' event
+00:12:21     TRACE: Processing idle_timeout 'printing' event
+00:13:02     TRACE: Processing idle_timeout 'ready' event
+00:13:15     TRACE: Processing idle_timeout 'printing' event
+00:13:15     TRACE: Processing idle_timeout 'ready' event
+00:15:05     TRACE: Processing idle_timeout 'printing' event
+00:15:06     TRACE: Processing idle_timeout 'ready' event
+00:15:34     TRACE: Processing idle_timeout 'printing' event
+00:15:36     TRACE: Processing idle_timeout 'ready' event
+00:15:39     TRACE: Processing idle_timeout 'printing' event
+00:15:40     TRACE: Processing idle_timeout 'ready' event
+00:15:46     TRACE: Processing idle_timeout 'printing' event
+00:15:47     TRACE: Processing idle_timeout 'ready' event
+00:15:55     TRACE: Processing idle_timeout 'printing' event
+00:15:55     TRACE: Processing idle_timeout 'ready' event
+00:16:24     TRACE: Processing idle_timeout 'printing' event
+00:16:25   DEBUG: Klipper disconnected!
+00:16:44 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+00:16:44   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+00:16:44   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+00:16:44   DEBUG: Loaded saved bowden lengths: [766.7, 766.7, 766.7, 766.7]
+00:16:44   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+00:16:45   DEBUG: Loading persisted MMU state
+00:16:45     TRACE: Setting gear motor rotation distance: 13.6000
+00:16:47 > __MMU_BOOTUP
+00:16:47 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+00:16:47   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+00:16:47     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+00:16:47 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\*/|------------ T0
+00:16:47 [T0] > (*) >>>>>>>>>> (*) >> [Ex >>> Nz] LOADED 0.0mm
+00:16:47     TRACE: Processing idle_timeout 'printing' event
+00:16:47   DEBUG: MmuSyncFeedbackManager: Synced MMU to extruder
+00:16:48     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+00:16:48 > MMU_STATS COUNTER=mmu_restarts INCR=1
+00:16:48     TRACE: Processing idle_timeout 'ready' event
+00:17:23     TRACE: Processing idle_timeout 'printing' event
+00:18:16     TRACE: Processing idle_timeout 'ready' event
+00:18:26     TRACE: Processing idle_timeout 'printing' event
+00:18:27     TRACE: Processing idle_timeout 'ready' event
+00:19:13     TRACE: Processing idle_timeout 'printing' event
+00:19:15     TRACE: Processing idle_timeout 'ready' event
+00:19:21     TRACE: Processing idle_timeout 'printing' event
+00:20:06     TRACE: Processing idle_timeout 'ready' event
+00:20:14     TRACE: Processing idle_timeout 'printing' event
+00:20:15     TRACE: Processing idle_timeout 'ready' event
+00:20:28     TRACE: Processing idle_timeout 'printing' event
+00:20:30     TRACE: Processing idle_timeout 'ready' event
+00:28:30     TRACE: Processing idle_timeout 'printing' event
+00:28:31   DEBUG: Klipper disconnected!
+00:28:49 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+00:28:49   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+00:28:49   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+00:28:49   DEBUG: Loaded saved bowden lengths: [766.7, 766.7, 766.7, 766.7]
+00:28:49   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+00:28:50   DEBUG: Loading persisted MMU state
+00:28:50     TRACE: Setting gear motor rotation distance: 13.6000
+00:28:53 > __MMU_BOOTUP
+00:28:53 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+00:28:53   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+00:28:53     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+00:28:53 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\*/|------------ T0
+00:28:53 [T0] > (*) >>>>>>>>>> (*) >> [Ex >>> Nz] LOADED 0.0mm
+00:28:53     TRACE: Processing idle_timeout 'printing' event
+00:28:53   DEBUG: MmuSyncFeedbackManager: Synced MMU to extruder
+00:28:53     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+00:28:53 > MMU_STATS COUNTER=mmu_restarts INCR=1
+00:28:54     TRACE: Processing idle_timeout 'ready' event
+00:28:54     TRACE: Processing idle_timeout 'printing' event
+00:29:56     TRACE: Processing idle_timeout 'ready' event
+00:30:07     TRACE: Processing idle_timeout 'printing' event
+00:30:08     TRACE: Processing idle_timeout 'ready' event
+00:30:13     TRACE: Processing idle_timeout 'printing' event
+00:30:13     TRACE: Processing idle_timeout 'ready' event
+00:30:24     TRACE: Processing idle_timeout 'printing' event
+00:30:25     TRACE: Processing idle_timeout 'ready' event
+00:30:37     TRACE: Processing idle_timeout 'printing' event
+00:30:38     TRACE: Processing idle_timeout 'ready' event
+00:30:41     TRACE: Processing idle_timeout 'printing' event
+00:30:42   DEBUG: Klipper disconnected!
+00:31:01 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+00:31:01   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+00:31:01   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+00:31:01   DEBUG: Loaded saved bowden lengths: [766.7, 766.7, 766.7, 766.7]
+00:31:01   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+00:31:02   DEBUG: Loading persisted MMU state
+00:31:02     TRACE: Setting gear motor rotation distance: 13.6000
+00:31:04 > __MMU_BOOTUP
+00:31:04 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+00:31:04   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+00:31:04     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+00:31:04 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\*/|------------ T0
+00:31:04 [T0] > (*) >>>>>>>>>> (*) >> [Ex >>> Nz] LOADED 0.0mm
+00:31:04     TRACE: Processing idle_timeout 'printing' event
+00:31:04   DEBUG: MmuSyncFeedbackManager: Synced MMU to extruder
+00:31:05     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+00:31:05 > MMU_STATS COUNTER=mmu_restarts INCR=1
+00:31:05     TRACE: Processing idle_timeout 'ready' event
+00:31:12     TRACE: Processing idle_timeout 'printing' event
+00:32:14     TRACE: Processing idle_timeout 'ready' event
+00:32:51     TRACE: Processing idle_timeout 'printing' event
+00:32:53     TRACE: Processing idle_timeout 'ready' event
+00:32:59     TRACE: Processing idle_timeout 'printing' event
+00:33:01     TRACE: Processing idle_timeout 'ready' event
+00:33:21     TRACE: Processing idle_timeout 'printing' event
+00:33:45     TRACE: Processing idle_timeout 'ready' event
+00:33:46     TRACE: Processing idle_timeout 'printing' event
+00:33:47     TRACE: Processing idle_timeout 'ready' event
+00:33:56     TRACE: Processing idle_timeout 'printing' event
+00:33:57     TRACE: Processing idle_timeout 'ready' event
+00:34:11     TRACE: Processing idle_timeout 'printing' event
+00:34:12     TRACE: Processing idle_timeout 'ready' event
+00:34:15     TRACE: Processing idle_timeout 'printing' event
+00:34:16   DEBUG: Klipper disconnected!
+00:34:34 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+00:34:34   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+00:34:34   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+00:34:35   DEBUG: Loaded saved bowden lengths: [766.7, 766.7, 766.7, 766.7]
+00:34:35   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+00:34:35   DEBUG: Loading persisted MMU state
+00:34:35     TRACE: Setting gear motor rotation distance: 13.6000
+00:34:38 > __MMU_BOOTUP
+00:34:38 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+00:34:38   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+00:34:38     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+00:34:38 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\*/|------------ T0
+00:34:38 [T0] > (*) >>>>>>>>>> (*) >> [Ex >>> Nz] LOADED 0.0mm
+00:34:38     TRACE: Processing idle_timeout 'printing' event
+00:34:38   DEBUG: MmuSyncFeedbackManager: Synced MMU to extruder
+00:34:39     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+00:34:39 > MMU_STATS COUNTER=mmu_restarts INCR=1
+00:34:39     TRACE: Processing idle_timeout 'ready' event
+00:34:39     TRACE: Processing idle_timeout 'printing' event
+00:35:38     TRACE: Processing idle_timeout 'ready' event
+00:35:39     TRACE: Processing idle_timeout 'printing' event
+00:35:40     TRACE: Processing idle_timeout 'ready' event
+00:36:16 > MMU_UNLOAD
+00:36:16     TRACE: Disabled runout detection
+00:36:16   DEBUG: Saving toolhead gcode state and position (X:133.0 Y:133.0 Z:10.0 E:0.0) for unload
+00:36:16     TRACE: Running macro: _MMU_SAVE_POSITION
+00:36:16 Saving toolhead position (x:133.0, y:133.0, z:10.0)
+00:36:16     TRACE: Running macro: _MMU_PARK
+00:36:16 Retracting 2.0mm
+00:36:16 Parking toolhead at (x:n/a, y:n/a, z:11.0) for unload operation
+00:36:16     TRACE: Processing idle_timeout 'printing' event
+00:36:17   DEBUG: Unloading tool T0
+00:36:19     TRACE: Running macro: _MMU_ACTION_CHANGED ACTION='Unloading' OLD_ACTION='Idle'
+00:36:19     TRACE: Running macro: _MMU_PRE_UNLOAD
+00:36:20 Unloading filament...
+00:36:20 [T0] < (*) <<<<<<<<<< (*) << [Ex <<< Nz] LOADED 0.0mm
+00:36:20     TRACE: Running macro: _MMU_ACTION_CHANGED ACTION='Forming Tip' OLD_ACTION='Unloading'
+00:36:20     TRACE: _ensure_safe_extruder_temperature: current_temp=260.59, paused_extruder_temp=None, current_target_temp=260.0, klipper_minimum_temp=175.0, gate_temp=255, default_extruder_temp=200.0, source=auto
+00:36:20   DEBUG: Setting pressure advance for tip forming: 0.0000
+00:36:20 Forming tip...
+00:36:20     TRACE: Running macro: _MMU_FORM_TIP 
+00:36:22     TRACE: MmuSyncFeedbackManager: Sync direction changed from static to retract
+00:36:32   DEBUG: Restoring pressure advance: 0.0320
+00:36:32     TRACE: After tip forming, extruder moved: 33.3mm thus park_pos calculated as 35.3mm (encoder measured 0.0mm total movement)
+00:36:32 [T0] < (*) <<<<<<<<<< (*) << [Ex <<. Nz] -35.3mm
+00:36:32     TRACE: Running macro: _MMU_ACTION_CHANGED ACTION='Unloading' OLD_ACTION='Forming Tip'
+00:36:32     TRACE: Running macro: _MMU_POST_FORM_TIP
+00:36:32     TRACE: Running macro: _MMU_ACTION_CHANGED ACTION='Exiting Ext' OLD_ACTION='Unloading'
+00:36:32   DEBUG: Extracting filament from extruder
+00:36:32     TRACE: _ensure_safe_extruder_temperature: current_temp=261.36, paused_extruder_temp=None, current_target_temp=260.0, klipper_minimum_temp=175.0, gate_temp=255, default_extruder_temp=200.0, source=auto
+00:36:32   DEBUG: Reverse homing up to 105.0mm off extruder sensor (synced) to exit extruder
+00:36:33   DEBUG: MmuSyncFeedbackManager: Unsynced MMU from extruder
+00:36:33     TRACE: MmuSyncFeedbackManager: Reset rotation distance to last calibrated value (13.6000)
+00:36:33     TRACE: Setting gear motor rotation distance: 13.6000
+00:36:37     TRACE: Reverse homing off extruder sensor. Stepper: 'gear+extruder' homed after moving -73.1mm (of max -105.0mm), encoder measured 0.0mm (delta 73.1mm). Pos: @-108.4, (0.0mm). Pos: @-108.4, (0.0mm)
+00:36:37 [T0] < (*) <<<<<<<<<<|(e) .. [Ex ... Nz] -108.4mm
+00:36:38   DEBUG: Filament should be out of extruder
+00:36:38     TRACE: Running macro: _MMU_ACTION_CHANGED ACTION='Unloading' OLD_ACTION='Exiting Ext'
+00:36:38   DEBUG: Unloading bowden tube
+00:36:38     TRACE: Fast unloading move through bowden. Stepper: 'gear' moved -716.7mm, encoder measured 0.0mm (delta 716.7mm). Pos: @-813.7, (0.0mm)
+00:36:48 [T0] < (*) <<........ (e) .. [Ex ... Nz] -813.7mm
+00:36:49     TRACE: Reverse homing off mmu_gate sensor. Stepper: 'gear' homed after moving -20.5mm (of max -850.0mm), encoder measured 0.0mm (delta 20.5mm). Pos: @-834.2, (0.0mm). Pos: @-834.2, (0.0mm)
+00:36:49 [T0] <|(g) .......... (e) .. [Ex ... Nz] -834.2mm
+00:36:49     TRACE: Final parking. Stepper: 'gear' moved -100.0mm, encoder measured 0.0mm (delta 100.0mm). Pos: @-934.2, (0.0mm)
+00:36:49 [T0] < (g) .......... (e) .. [Ex ... Nz] UNLOADED -934.2mm
+00:36:49     TRACE: Running macro: _MMU_EVENT EVENT=gate_map_changed GATE=0
+00:36:51 Unload of -934.2mm filament successful
+00:36:51   DEBUG: Autotune: bowden move ratio: 0.0000, Extra homing movement: -70.5mm Autotuned bowden length: 765.4
+00:36:52     TRACE: Running macro: _MMU_POST_UNLOAD
+00:36:52     TRACE: Running macro: _MMU_ACTION_CHANGED ACTION='Idle' OLD_ACTION='Unloading'
+00:36:52   DEBUG: Continuing from initialized state after unload
+00:36:52     TRACE: Running macro: _MMU_RESTORE_POSITION
+00:36:52 Restoring toolhead position to last pos using PURGE_PARK RESTORE=1 (x:133.0, y:133.0)
+00:36:52   DEBUG: Clearing saved toolhead position
+00:36:52   DEBUG: Ensuring correct gcode state and position (X:133.0 Y:133.0 Z:10.0 E:0.0) after unload
+00:36:52     TRACE: Enabled runout detection
+00:36:55     TRACE: Processing idle_timeout 'ready' event
+00:37:05     TRACE: Processing idle_timeout 'printing' event
+00:37:10     TRACE: Processing idle_timeout 'ready' event
+00:37:22     TRACE: Processing idle_timeout 'printing' event
+00:37:26     TRACE: Processing idle_timeout 'ready' event
+00:37:34     TRACE: Processing idle_timeout 'printing' event
+00:37:34     TRACE: Processing idle_timeout 'ready' event
+00:37:49     TRACE: Processing idle_timeout 'printing' event
+00:37:53     TRACE: Processing idle_timeout 'ready' event
+00:38:05     TRACE: Processing idle_timeout 'printing' event
+00:39:07     TRACE: Processing idle_timeout 'ready' event
+00:39:14     TRACE: Processing idle_timeout 'printing' event
+00:39:15     TRACE: Processing idle_timeout 'ready' event
+00:39:34     TRACE: Processing idle_timeout 'printing' event
+00:39:35     TRACE: Processing idle_timeout 'ready' event
+00:39:36     TRACE: Processing idle_timeout 'printing' event
+00:39:37     TRACE: Processing idle_timeout 'ready' event
+00:40:33     TRACE: Processing idle_timeout 'printing' event
+00:40:33     TRACE: Processing idle_timeout 'ready' event
+00:41:07     TRACE: Processing idle_timeout 'printing' event
+00:41:09     TRACE: Processing idle_timeout 'ready' event
+00:41:41     TRACE: Processing idle_timeout 'printing' event
+00:41:42     TRACE: Processing idle_timeout 'ready' event
+00:42:02     TRACE: Processing idle_timeout 'printing' event
+00:42:03     TRACE: Processing idle_timeout 'ready' event
+00:42:17     TRACE: Processing idle_timeout 'printing' event
+00:43:16     TRACE: Processing idle_timeout 'ready' event
+00:43:21     TRACE: Processing idle_timeout 'printing' event
+00:43:22     TRACE: Processing idle_timeout 'ready' event
+00:43:32     TRACE: Processing idle_timeout 'printing' event
+00:43:33     TRACE: Processing idle_timeout 'ready' event
+00:43:34     TRACE: Processing idle_timeout 'printing' event
+00:43:35     TRACE: Processing idle_timeout 'ready' event
+00:46:41     TRACE: Processing idle_timeout 'printing' event
+00:46:42     TRACE: Processing idle_timeout 'ready' event
+00:46:43     TRACE: Processing idle_timeout 'printing' event
+00:46:44     TRACE: Processing idle_timeout 'ready' event
+00:51:01     TRACE: Processing idle_timeout 'printing' event
+00:51:02   DEBUG: Klipper disconnected!
+00:53:28 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+00:53:28   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+00:53:28   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+00:53:28   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+00:53:28   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+00:53:29   DEBUG: Loading persisted MMU state
+00:53:29     TRACE: Setting gear motor rotation distance: 13.6000
+00:53:32 > __MMU_BOOTUP
+00:53:32 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+00:53:32   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+00:53:32     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+00:53:32 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+00:53:32 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+00:53:32     TRACE: Processing idle_timeout 'printing' event
+00:53:32     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+00:53:32 > MMU_STATS COUNTER=mmu_restarts INCR=1
+00:53:32     TRACE: Processing idle_timeout 'ready' event
+00:53:54     TRACE: Processing idle_timeout 'printing' event
+00:55:05     TRACE: Processing idle_timeout 'ready' event
+00:55:11     TRACE: Processing idle_timeout 'printing' event
+00:55:12     TRACE: Processing idle_timeout 'ready' event
+00:55:21     TRACE: Processing idle_timeout 'printing' event
+00:55:22     TRACE: Processing idle_timeout 'ready' event
+00:55:33     TRACE: Processing idle_timeout 'printing' event
+00:55:35     TRACE: Processing idle_timeout 'ready' event
+01:05:35     TRACE: Processing idle_timeout 'idle' event
+01:05:35 > MMU_PRINT_END STATE=standby IDLE_TIMEOUT=1
+01:14:36     TRACE: Processing idle_timeout 'printing' event
+01:15:24     TRACE: Processing idle_timeout 'ready' event
+01:17:12     TRACE: Processing idle_timeout 'printing' event
+01:17:13   DEBUG: Klipper disconnected!
+01:17:32 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+01:17:32   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+01:17:32   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+01:17:32   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+01:17:32   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+01:17:33   DEBUG: Loading persisted MMU state
+01:17:33     TRACE: Setting gear motor rotation distance: 13.6000
+01:17:36 > __MMU_BOOTUP
+01:17:36 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+01:17:36   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+01:17:36     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+01:17:36 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+01:17:36 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+01:17:36     TRACE: Processing idle_timeout 'printing' event
+01:17:36     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+01:17:36 > MMU_STATS COUNTER=mmu_restarts INCR=1
+01:17:37     TRACE: Processing idle_timeout 'ready' event
+01:20:17     TRACE: Processing idle_timeout 'printing' event
+01:20:18   DEBUG: Klipper disconnected!
+01:20:36 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+01:20:36   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+01:20:36   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+01:20:36   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+01:20:36   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+01:20:37   DEBUG: Loading persisted MMU state
+01:20:37     TRACE: Setting gear motor rotation distance: 13.6000
+01:20:40 > __MMU_BOOTUP
+01:20:40 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+01:20:40   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+01:20:40     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+01:20:40 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+01:20:40 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+01:20:40     TRACE: Processing idle_timeout 'printing' event
+01:20:40     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+01:20:40 > MMU_STATS COUNTER=mmu_restarts INCR=1
+01:20:40     TRACE: Processing idle_timeout 'ready' event
+01:20:44 > CLEAR_PAUSE
+01:20:44   DEBUG: MMU CLEAR_PAUSE wrapper called
+01:20:44     TRACE: Running macro: _MMU_CLEAR_POSITION
+01:20:44   DEBUG: Clearing saved toolhead position
+01:20:44     TRACE: Running macro: __CLEAR_PAUSE
+01:21:11     TRACE: Processing idle_timeout 'printing' event
+01:21:12   DEBUG: Klipper disconnected!
+01:21:31 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+01:21:31   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+01:21:31   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+01:21:31   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+01:21:31   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+01:21:32   DEBUG: Loading persisted MMU state
+01:21:32     TRACE: Setting gear motor rotation distance: 13.6000
+01:21:34 > __MMU_BOOTUP
+01:21:34 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+01:21:34   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+01:21:34     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+01:21:34 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+01:21:34 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+01:21:34     TRACE: Processing idle_timeout 'printing' event
+01:21:35     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+01:21:35 > MMU_STATS COUNTER=mmu_restarts INCR=1
+01:21:35     TRACE: Processing idle_timeout 'ready' event
+01:21:42 > CLEAR_PAUSE
+01:21:42   DEBUG: MMU CLEAR_PAUSE wrapper called
+01:21:42     TRACE: Running macro: _MMU_CLEAR_POSITION
+01:21:42   DEBUG: Clearing saved toolhead position
+01:21:42     TRACE: Running macro: __CLEAR_PAUSE
+01:21:42     TRACE: Processing idle_timeout 'printing' event
+01:21:43     TRACE: Processing idle_timeout 'ready' event
+01:25:00     TRACE: Processing idle_timeout 'printing' event
+01:25:01   DEBUG: Klipper disconnected!
+01:25:20 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+01:25:20   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+01:25:20   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+01:25:20   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+01:25:20   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+01:25:21   DEBUG: Loading persisted MMU state
+01:25:21     TRACE: Setting gear motor rotation distance: 13.6000
+01:25:23 > __MMU_BOOTUP
+01:25:23 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+01:25:23   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+01:25:23     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+01:25:23 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+01:25:23 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+01:25:24     TRACE: Processing idle_timeout 'printing' event
+01:25:24     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+01:25:24 > MMU_STATS COUNTER=mmu_restarts INCR=1
+01:25:24     TRACE: Processing idle_timeout 'ready' event
+01:25:31 > CLEAR_PAUSE
+01:25:31   DEBUG: MMU CLEAR_PAUSE wrapper called
+01:25:31     TRACE: Running macro: _MMU_CLEAR_POSITION
+01:25:31   DEBUG: Clearing saved toolhead position
+01:25:31     TRACE: Running macro: __CLEAR_PAUSE
+01:25:31     TRACE: Processing idle_timeout 'printing' event
+01:25:32     TRACE: Processing idle_timeout 'ready' event
+01:28:51     TRACE: Processing idle_timeout 'printing' event
+01:28:52   DEBUG: Klipper disconnected!
+01:36:16 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+01:36:16   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+01:36:16   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+01:36:16   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+01:36:16   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+01:36:16   DEBUG: Loading persisted MMU state
+01:36:16     TRACE: Setting gear motor rotation distance: 13.6000
+01:36:19 > __MMU_BOOTUP
+01:36:19 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+01:36:19   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+01:36:19     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+01:36:19 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+01:36:19 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+01:36:19     TRACE: Processing idle_timeout 'printing' event
+01:36:19     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+01:36:20 > MMU_STATS COUNTER=mmu_restarts INCR=1
+01:36:20     TRACE: Processing idle_timeout 'ready' event
+01:36:33 > CLEAR_PAUSE
+01:36:33   DEBUG: MMU CLEAR_PAUSE wrapper called
+01:36:33     TRACE: Running macro: _MMU_CLEAR_POSITION
+01:36:33   DEBUG: Clearing saved toolhead position
+01:36:33     TRACE: Running macro: __CLEAR_PAUSE
+01:36:33     TRACE: Processing idle_timeout 'printing' event
+01:37:23     TRACE: Processing idle_timeout 'ready' event
+01:39:34     TRACE: Processing idle_timeout 'printing' event
+01:39:36   DEBUG: Klipper disconnected!
+01:39:55 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+01:39:55   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+01:39:55   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+01:39:55   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+01:39:55   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+01:39:55   DEBUG: Loading persisted MMU state
+01:39:55     TRACE: Setting gear motor rotation distance: 13.6000
+01:39:58 > __MMU_BOOTUP
+01:39:58 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+01:39:58   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+01:39:58     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+01:39:58 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+01:39:58 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+01:39:58     TRACE: Processing idle_timeout 'printing' event
+01:39:58     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+01:39:59 > MMU_STATS COUNTER=mmu_restarts INCR=1
+01:39:59     TRACE: Processing idle_timeout 'ready' event
+01:40:10 > CLEAR_PAUSE
+01:40:10   DEBUG: MMU CLEAR_PAUSE wrapper called
+01:40:10     TRACE: Running macro: _MMU_CLEAR_POSITION
+01:40:10   DEBUG: Clearing saved toolhead position
+01:40:10     TRACE: Running macro: __CLEAR_PAUSE
+01:40:10     TRACE: Processing idle_timeout 'printing' event
+01:47:14 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+01:47:14   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+01:47:14   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+01:47:14   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+01:47:14   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+01:47:14   DEBUG: Loading persisted MMU state
+01:47:15     TRACE: Setting gear motor rotation distance: 13.6000
+01:47:17 > __MMU_BOOTUP
+01:47:17 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+01:47:17   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+01:47:17     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+01:47:17 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+01:47:17 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+01:47:17     TRACE: Processing idle_timeout 'printing' event
+01:47:17     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+01:47:18 > MMU_STATS COUNTER=mmu_restarts INCR=1
+01:47:18     TRACE: Processing idle_timeout 'ready' event
+01:47:43     TRACE: Processing idle_timeout 'printing' event
+01:47:44   DEBUG: Klipper disconnected!
+01:48:03 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+01:48:03   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+01:48:03   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+01:48:03   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+01:48:03   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+01:48:04   DEBUG: Loading persisted MMU state
+01:48:04     TRACE: Setting gear motor rotation distance: 13.6000
+01:48:06 > __MMU_BOOTUP
+01:48:06 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+01:48:06   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+01:48:06     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+01:48:06 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+01:48:06 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+01:48:06     TRACE: Processing idle_timeout 'printing' event
+01:48:07     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+01:48:07 > MMU_STATS COUNTER=mmu_restarts INCR=1
+01:48:07     TRACE: Processing idle_timeout 'ready' event
+20:24:04 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+20:24:04   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+20:24:04   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+20:24:04   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+20:24:04   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+20:24:05   DEBUG: Loading persisted MMU state
+20:24:05     TRACE: Setting gear motor rotation distance: 13.6000
+20:24:08 > __MMU_BOOTUP
+20:24:08 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+20:24:08   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+20:24:08     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+20:24:08 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+20:24:08 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+20:24:08     TRACE: Processing idle_timeout 'printing' event
+20:24:08     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+20:24:08 > MMU_STATS COUNTER=mmu_restarts INCR=1
+20:24:09     TRACE: Processing idle_timeout 'ready' event
+20:33:29     TRACE: Processing idle_timeout 'printing' event
+20:33:30   DEBUG: Klipper disconnected!
+20:33:48 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+20:33:48   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+20:33:48   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+20:33:49   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+20:33:49   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+20:33:49   DEBUG: Loading persisted MMU state
+20:33:49     TRACE: Setting gear motor rotation distance: 13.6000
+20:33:50     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:33:52 > __MMU_BOOTUP
+20:33:52 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+20:33:52   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+20:33:52     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+20:33:52 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+20:33:52 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+20:33:52     TRACE: Processing idle_timeout 'printing' event
+20:33:52     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+20:33:52 > MMU_STATS COUNTER=mmu_restarts INCR=1
+20:33:53     TRACE: Processing idle_timeout 'ready' event
+20:34:00     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (1.0)
+20:34:02     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:34:03     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (1.0)
+20:34:03     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:34:04     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (1.0)
+20:34:04     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:34:05     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (1.0)
+20:34:05     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:36:16     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (1.0)
+20:36:19     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:36:20     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (1.0)
+20:36:21     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:36:24     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (1.0)
+20:36:28     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:36:33     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (1.0)
+20:36:35     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:36:36     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (1.0)
+20:36:36     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:37:33     TRACE: Processing idle_timeout 'printing' event
+20:37:35   DEBUG: Klipper disconnected!
+20:37:53 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+20:37:53   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+20:37:53   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+20:37:53   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+20:37:53   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+20:37:54   DEBUG: Loading persisted MMU state
+20:37:54     TRACE: Setting gear motor rotation distance: 13.6000
+20:37:54     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:37:57 > __MMU_BOOTUP
+20:37:57 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+20:37:57   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+20:37:57     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+20:37:57 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+20:37:57 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+20:37:57     TRACE: Processing idle_timeout 'printing' event
+20:37:57     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+20:37:57 > MMU_STATS COUNTER=mmu_restarts INCR=1
+20:37:58     TRACE: Processing idle_timeout 'ready' event
+20:42:22     TRACE: Processing idle_timeout 'printing' event
+20:42:23   DEBUG: Klipper disconnected!
+20:42:41 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+20:42:41   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+20:42:41   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+20:42:41   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+20:42:41   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+20:42:42   DEBUG: Loading persisted MMU state
+20:42:42     TRACE: Setting gear motor rotation distance: 13.6000
+20:42:42     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:42:44 > __MMU_BOOTUP
+20:42:44 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+20:42:44   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+20:42:44     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+20:42:44 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+20:42:44 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+20:42:44     TRACE: Processing idle_timeout 'printing' event
+20:42:45     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+20:42:45 > MMU_STATS COUNTER=mmu_restarts INCR=1
+20:42:45     TRACE: Processing idle_timeout 'ready' event
+20:43:33     TRACE: Processing idle_timeout 'printing' event
+20:43:34   DEBUG: Klipper disconnected!
+20:43:53 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+20:43:53   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+20:43:53   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+20:43:53   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+20:43:53   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+20:43:53     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:43:54   DEBUG: Loading persisted MMU state
+20:43:54     TRACE: Setting gear motor rotation distance: 13.6000
+20:43:57 > __MMU_BOOTUP
+20:43:57 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+20:43:57   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+20:43:57     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+20:43:57 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+20:43:57 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+20:43:57     TRACE: Processing idle_timeout 'printing' event
+20:43:57     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+20:43:57 > MMU_STATS COUNTER=mmu_restarts INCR=1
+20:43:58     TRACE: Processing idle_timeout 'ready' event
+20:44:07     TRACE: Processing idle_timeout 'printing' event
+20:44:07     TRACE: Processing idle_timeout 'ready' event
+20:44:41     TRACE: Processing idle_timeout 'printing' event
+20:44:42     TRACE: Processing idle_timeout 'ready' event
+20:52:15 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+20:52:15   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+20:52:15   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+20:52:15   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+20:52:15   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+20:52:15     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:52:15   DEBUG: Loading persisted MMU state
+20:52:15     TRACE: Setting gear motor rotation distance: 13.6000
+20:52:18 > __MMU_BOOTUP
+20:52:18 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+20:52:18   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+20:52:18     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+20:52:18 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+20:52:18 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+20:52:18     TRACE: Processing idle_timeout 'printing' event
+20:52:18     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+20:52:18 > MMU_STATS COUNTER=mmu_restarts INCR=1
+20:52:19     TRACE: Processing idle_timeout 'ready' event
+20:55:20 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+20:55:20   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+20:55:20   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+20:55:20   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+20:55:20   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+20:55:21     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+20:55:22   DEBUG: Loading persisted MMU state
+20:55:22     TRACE: Setting gear motor rotation distance: 13.6000
+20:55:24 > __MMU_BOOTUP
+20:55:24 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+20:55:24   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+20:55:24     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+20:55:24 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+20:55:24 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+20:55:24     TRACE: Processing idle_timeout 'printing' event
+20:55:25     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+20:55:25 > MMU_STATS COUNTER=mmu_restarts INCR=1
+20:55:25     TRACE: Processing idle_timeout 'ready' event
+21:05:25     TRACE: Processing idle_timeout 'idle' event
+21:05:25 > MMU_PRINT_END STATE=standby IDLE_TIMEOUT=1
+21:58:35 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+21:58:35   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+21:58:35   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+21:58:35   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+21:58:35   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+21:58:36     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+21:58:36   DEBUG: Loading persisted MMU state
+21:58:36     TRACE: Setting gear motor rotation distance: 13.6000
+21:58:39 > __MMU_BOOTUP
+21:58:39 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+21:58:39   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+21:58:39     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+21:58:39 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+21:58:39 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+21:58:39     TRACE: Processing idle_timeout 'printing' event
+21:58:39     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+21:58:39 > MMU_STATS COUNTER=mmu_restarts INCR=1
+21:58:39     TRACE: Processing idle_timeout 'ready' event
+22:08:40     TRACE: Processing idle_timeout 'idle' event
+22:08:40 > MMU_PRINT_END STATE=standby IDLE_TIMEOUT=1
+22:29:57 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+22:29:57   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+22:29:57   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+22:29:57   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+22:29:57   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+22:29:57     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+22:29:58   DEBUG: Loading persisted MMU state
+22:29:58     TRACE: Setting gear motor rotation distance: 13.6000
+22:30:00 > __MMU_BOOTUP
+22:30:00 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+22:30:00   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+22:30:00     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+22:30:00 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+22:30:00 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+22:30:00     TRACE: Processing idle_timeout 'printing' event
+22:30:01     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+22:30:01 > MMU_STATS COUNTER=mmu_restarts INCR=1
+22:30:01     TRACE: Processing idle_timeout 'ready' event
+22:40:01     TRACE: Processing idle_timeout 'idle' event
+22:40:01 > MMU_PRINT_END STATE=standby IDLE_TIMEOUT=1
+23:06:09     TRACE: Processing idle_timeout 'printing' event
+23:07:04     TRACE: Processing idle_timeout 'ready' event
+23:12:12 
+         
+         
+         MMU Startup -----------------------------------------------
+         
+23:12:12   DEBUG: Found tmc2209 on extruder. Current control enabled. Stallguard 'touch' homing possible.
+23:12:12   DEBUG: TMC driver not found for gear_stepper, cannot use current reduction for collision detection or while synchronized printing
+23:12:12   DEBUG: Loaded saved bowden lengths: [765.4, 765.4, 765.4, 765.4]
+23:12:12   DEBUG: Loaded saved gear rotation distances: [13.6, 13.6, 13.6, 13.6]
+23:12:13     TRACE: MmuSyncFeedbackManager(inactive): Got sync force feedback update. State: disabled (-1.0)
+23:12:13   DEBUG: Loading persisted MMU state
+23:12:13     TRACE: Setting gear motor rotation distance: 13.6000
+23:12:16 > __MMU_BOOTUP
+23:12:16 (\_/)
+         ( *,*)
+         (")_(") Happy Hare v3.4.1 Ready...
+23:12:16   DEBUG: Job State: READY -> INITIALIZED (MMU State: Encoder: n/a, Synced: False, Paused temp: None, Resume to state: ready, Position saved for: , pause_resume: False, Idle timeout: 600.00s)
+23:12:16     TRACE: Running macro: _MMU_PRINT_STATE_CHANGED STATE='initialized' OLD_STATE='ready'
+23:12:16 Gate : | 0 | 1 | 2 | 3 |
+         Tools: |T0 |T1 |T2 |T3 |
+         Avail: | * |   |   |   |
+         Selct: |\ /|------------ T0
+23:12:16 [T0] > (g) .......... (e) .. [Ex ... Nz] UNLOADED 0.0mm
+23:12:16     TRACE: Processing idle_timeout 'printing' event
+23:12:16     TRACE: Running macro: _MMU_EVENT EVENT=restart 
+23:12:16 > MMU_STATS COUNTER=mmu_restarts INCR=1
+23:12:17     TRACE: Processing idle_timeout 'ready' event
+23:17:52 > MMU_CHECK_GATE GATE=0 QUIET=1
+23:17:52     TRACE: Disabled runout detection
+23:17:52     TRACE: Running macro: _MMU_ACTION_CHANGED ACTION='Checking' OLD_ACTION='Idle'
+23:17:52 Checking gate 0...
+23:17:52     TRACE: Processing idle_timeout 'printing' event
+23:17:55     TRACE: Initial homing to mmu_gate sensor. Stepper: 'gear' homed after moving 109.9mm (of max 850.0mm), encoder measured 0.0mm (delta 109.9mm). Pos: @109.9, (0.0mm). Pos: @109.9, (0.0mm)
+23:17:55   DEBUG: Endstop mmu_gate reached after 109.9mm (measured 0.0mm)
+23:17:55 Gate 0 - Filament detected. Marked available
+23:17:55     TRACE: Reverse homing off mmu_gate sensor. Stepper: 'gear' homed after moving -8.4mm (of max -850.0mm), encoder measured 0.0mm (delta 8.4mm). Pos: @101.5, (0.0mm). Pos: @101.5, (0.0mm)
+23:17:55     TRACE: Final parking. Stepper: 'gear' moved -100.0mm, encoder measured 0.0mm (delta 100.0mm). Pos: @1.5, (0.0mm)
+23:17:55   DEBUG: Selecting tool T0 on gate 0...
+23:17:55 Tool T0 enabled
+23:17:56     TRACE: Running macro: _MMU_ACTION_CHANGED ACTION='Idle' OLD_ACTION='Checking'
+23:17:56     TRACE: Enabled runout detection
+23:17:59     TRACE: Processing idle_timeout 'ready' event
+23:24:29     TRACE: Processing idle_timeout 'printing' event
+23:24:30     TRACE: Processing idle_timeout 'ready' event
+23:24:51     TRACE: Processing idle_timeout 'printing' event
+23:24:52     TRACE: Processing idle_timeout 'ready' event
+23:34:52     TRACE: Processing idle_timeout 'idle' event
+23:34:52 > MMU_PRINT_END STATE=standby IDLE_TIMEOUT=1
+23:36:12     TRACE: Processing idle_timeout 'printing' event
+23:36:13     TRACE: Processing idle_timeout 'ready' event
+23:36:14     TRACE: Processing idle_timeout 'printing' event
+23:36:20     TRACE: Processing idle_timeout 'ready' event
+23:36:21     TRACE: Processing idle_timeout 'printing' event
+23:36:22     TRACE: Processing idle_timeout 'ready' event
+23:46:22     TRACE: Processing idle_timeout 'idle' event
+23:46:22 > MMU_PRINT_END STATE=standby IDLE_TIMEOUT=1

@@ -1,0 +1,6240 @@
+Starting Klippy...
+Args: ['/home/mks/klipper/klippy/klippy.py', '/home/mks/printer_data/config/printer.cfg', '-I', '/home/mks/printer_data/comms/klippy.serial', '-l', '/home/mks/printer_data/logs/klippy.log', '-a', '/home/mks/printer_data/comms/klippy.sock']
+Git version: 'ee2c2a1-dirty'
+Modified files: Klipper-Adaptive-Meshing-Purging, QD_Q2/access/control/digital_keyboard_close.c, QD_Q2/access/control/digital_keyboard_ok.c, QD_Q2/access/startup/open_box_step1.gif, QD_Q2/access/startup/open_box_step2.gif, QD_Q2/access/startup/open_box_step3.gif, QD_Q2/access/startup/open_box_step4.gif, QD_Q2/access/startup/open_box_step5.gif, QD_Q2/bin/client, crowsnest, (+84 files)
+Branch: main
+Remote: origin
+Tracked URL: git@github.com:53Aries/Q2-Firmware.git
+CPU: 4 core ?
+Python: '3.9.2 (default, Feb 28 2021, 17:03:44) \n[GCC 10.2.1 20210110]'
+Start printer at Tue Dec  9 21:04:54 2025 (1765335894.7 555.7)
+===== Config file =====
+[gcode_macro CLEAN_NOZZLE]
+variable_x1 = 114
+variable_x2 = 100
+variable_f = 5000
+variable_count = 4
+gcode = 
+	{% set vars = printer["gcode_macro CLEAN_NOZZLE"] %}
+	{% set count = vars.count | int %}
+	{% set hotendtemp = params.HOTEND|default(250)|int %}
+	PURGE_PARK
+	M400
+	SET_HEATER_TEMPERATURE HEATER=extruder TARGET={hotendtemp}
+	TEMPERATURE_WAIT SENSOR=extruder MINIMUM={hotendtemp}
+	G92 E0
+	G1 E-2 F200
+	M400
+	M106 S255
+	G4 P1000
+	M104 S150
+	{% for i in range(count) %}
+	G1 X{vars.x1} F{vars.f}
+	G1 X{vars.x2} F{vars.f}
+	{% endfor %}
+	
+	
+	G1 X125 F15000
+	G1 X130 Y280 F6000
+	G1 Z-0.2 F600
+	SET_HEATER_TEMPERATURE HEATER=extruder TARGET=150
+	TEMPERATURE_WAIT SENSOR=extruder MAXIMUM=155
+	M106 S255
+	G2 I0.5 J0.5 F600
+	G2 I0.5 J0.5 F600
+	G2 I0.5 J0.5 F600
+	G1 X140 F200
+	G1 Y281 F200
+	G1 X130 F200
+	G1 Y283 F200
+	G1 X140 F200
+	
+	G2 I0.5 J0.5 F600
+	G2 I0.5 J0.5 F600
+	G2 I0.5 J0.5 F600
+	
+	G1 Z1
+	G1 X180 F12000
+	G1 Z-1.5
+	G1 X164 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	G1 Y284 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	M400
+	M118 Nozzle cleaned
+	G1 Z30 F900
+	M106 S0
+
+[gcode_macro DISABLE_ALL_HEATERS_FANS]
+description = Turn off all heaters and fans
+gcode = 
+	
+	TURN_OFF_HEATERS
+	
+	SET_FAN_SPEED FAN=cooling_fan SPEED=0
+	SET_FAN_SPEED FAN=auxiliary_cooling_fan SPEED=0
+	SET_FAN_SPEED FAN=chamber_circulation_fan SPEED=0
+
+[gcode_macro PRINTER_PARAM]
+variable_max_x_position = 270.0
+variable_max_y_position = 270.0
+variable_max_z_position = 260.0
+variable_clear_x_position = 88.0
+variable_clear_y_position = 287.0
+gcode = 
+
+[gcode_macro SHAKE_OOZE]
+gcode = 
+	MOVE_TO_TRASH
+	M204 S2000
+	M400
+	G4 P500
+	G91
+	{% for y in range(1,14) %}
+	G1 Y-1 F20000
+	
+	G1 Y1 F20000
+	
+	{% endfor %}
+	G90
+
+[gcode_macro MOVE_TO_TRASH]
+gcode = 
+	
+	
+	{% if "xy" not in printer.toolhead.homed_axes %}
+	G28 X Y
+	{% endif %}
+	M204 S5000
+	{% if (printer.gcode_move.position.y) > 270 %}
+	{% if (printer.gcode_move.position.x) > 112 or (printer.gcode_move.position.x) < 85 %}
+	G1 Y270 F20000
+	G1 X85 F20000
+	G1 Y270 F20000
+	G1 Y287.5 F3000
+	{% endif %}
+	G1 X85 F20000
+	G1 Y287.5 F3000
+	{% else %}
+	G1 X85 F20000
+	G1 Y260 F20000
+	G1 Y287.5 F3000
+	{% endif %}
+
+[gcode_macro EXTRUSION_AND_FLUSH]
+gcode = 
+	{% set hotendtemp = params.HOTEND|int %}
+	MOVE_TO_TRASH
+	M109 S{hotendtemp}
+	M83
+	{% for i in range(4) %}
+	G1 X{85 + i % 2 * 3} F5000
+	{% for j in range(1,6) %}
+	G1 E9 F300
+	G1 E1 F50
+	{% endfor %}
+	{% endfor %}
+	G1 E-1 F1800
+	M400
+	M106 S255
+	M400
+	G4 P5000
+	CLEAR_OOZE
+	CLEAR_FLUSH
+	MOVE_TO_TRASH
+	M106 S0
+
+[gcode_macro SHAPER_CALIBRATE]
+rename_existing = RESHAPER_CALIBRATE
+gcode = 
+	RESHAPER_CALIBRATE FREQ_START=20 FREQ_END=150
+
+[gcode_macro PRINT_END]
+gcode = 
+	M400
+	save_zoffset
+	SET_IDLE_TIMEOUT TIMEOUT={printer.configfile.settings.idle_timeout.timeout}
+	CLEAR_PAUSE
+	M106 P2 S0
+	M106 P0 S0
+	
+	DISABLE_BOX_HEATER
+	
+	M104 S0
+	M140 S0
+	M141 S0
+	
+	M220 S100
+	M221 S100
+	M84
+	
+	DISABLE_ALL_SENSOR
+	{% if printer.save_variables.variables.box_count >= 1 and printer.save_variables.variables.enable_box == 1 and printer["box_extras"]%}
+	BUFFER_MONITORING ENABLE=0
+	{% endif %}
+	
+	BED_MESH_CLEAR
+	G31
+	CLEAR_LAST_FILE
+	BEEP I=2 DUR=500
+	SDCARD_RESET_FILE
+
+[gcode_macro CANCEL_PRINT]
+rename_existing = BASE_CANCEL_PRINT
+gcode = 
+	{% if "xyz" in printer.toolhead.homed_axes %}
+	M204 S10000
+	G90
+	{% if (printer.gcode_move.position.z) < 100 %}
+	G1 Z100 F600
+	{% endif %}
+	{% if (printer.gcode_move.position.y) > printer['gcode_macro PRINTER_PARAM'].max_y_position %}
+	G1 Y{printer['gcode_macro PRINTER_PARAM'].max_y_position - 50} F6000
+	{% endif %}
+	G1  X265 Y5 F7800
+	{% endif %}
+	M400
+	save_zoffset
+	SET_IDLE_TIMEOUT TIMEOUT={printer.configfile.settings.idle_timeout.timeout}
+	
+	M106 P2 S0
+	M106 P0 S0
+	M106 P3 S0
+	
+	M104 S0
+	M140 S0
+	M141 S0
+	
+	M220 S100
+	M221 S100
+	M84
+	
+	DISABLE_ALL_SENSOR
+	SET_GCODE_OFFSET Z=0 MOVE=0
+	BED_MESH_CLEAR
+	G31
+	BEEP I=2 DUR=500
+	
+	BASE_CANCEL_PRINT
+	CLEAR_LAST_FILE
+	M118 Canceled print!
+
+[gcode_macro M141]
+gcode = 
+	{% if printer["heater_generic chamber"] is defined %}
+	{% set s = params.S|float %}
+	SET_HEATER_TEMPERATURE HEATER=chamber TARGET={([s, 65]|min)}
+	{% endif %}
+
+[gcode_macro M191]
+gcode = 
+	{% if printer["heater_generic chamber"] is defined %}
+	{% set s = params.S|float %}
+	
+	M141 {% for p in params %}{'%s%s' % (p, params[p])}{% endfor %}
+	{% if s != 0 %}
+	TEMPERATURE_WAIT SENSOR="heater_generic chamber" MINIMUM={([s, 65]|min)-2}
+	{% endif %}
+	{% endif %}
+
+[gcode_macro M107]
+gcode = 
+	SET_FAN_SPEED FAN=cooling_fan SPEED=0
+
+[gcode_macro M290]
+gcode = 
+	SET_GCODE_OFFSET Z_ADJUST={params.Z}
+
+[gcode_macro CUT_FILAMENT_1]
+gcode = 
+	{% if "xy" not in printer.toolhead.homed_axes %}
+	G28 X Y
+	{% endif %}
+	M204 S10000
+	{% if (printer.gcode_move.position.x) < 15 %}
+	G1 X15 F9000
+	G1 Y0.5 F9000
+	{% endif %}
+	G1 Y0.5 F15000
+	G1 X15 F15000
+	G1 X-0.5 F5000
+	G4 P1000
+	G1 X1 F1000
+	G1 X-0.5 F5000
+	G4 P1000
+	G1 X1 F1000
+	G4 P1000
+	G1 X15 F3000
+
+[gcode_macro M603]
+description = filament unlode
+gcode = 
+	DISABLE_ALL_SENSOR
+	{% set hotendtemp = params.S|default(250)|int %}
+	_CG28
+	M104 S{hotendtemp}
+	
+	MOVE_TO_TRASH
+	M109 S{hotendtemp}
+	M118 Heat up complete
+	
+	G92 E0
+	G1 E-10 F300
+	
+	
+	
+	
+	CUT_FILAMENT_1
+	MOVE_TO_TRASH
+	G92 E0
+	G1 E-60 F300
+	
+	
+	M104 S0
+	
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position + 20} F15000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position} F5000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position + 20} F15000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position} F5000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position + 20} F15000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position} F5000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position + 20} F15000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position} F5000
+	
+	M106 S0
+	M400
+	M118 Unload finish
+
+[gcode_macro M604]
+gcode = 
+	DISABLE_ALL_SENSOR
+	{% set hotendtemp = params.S|default(250)|int %}
+	{% set mode = params.T|default(0)|int %}
+	{% if mode == 0 %}
+	_CG28
+	MOVE_TO_TRASH
+	{% endif %}
+	
+	
+	
+	
+	{% if mode == 0 %}
+	M104 S{hotendtemp}
+	MOVE_TO_TRASH
+	M109 S{hotendtemp}
+	M118 Heat up complete
+	G92 E0
+	G1 E80 F400
+	M400
+	{% elif mode ==1 %}
+	MOVE_TO_TRASH
+	M109 S{hotendtemp}
+	M118 Heat up complete
+	G92 E0
+	G1 E80 F400
+	M400
+	{% endif %}
+	M118 Load finish
+
+[gcode_macro _Sensorless_Homing_Variables]
+description = Variables for sensorless homing
+variable_z_hop_distance = 10
+variable_first_homed_axis = 'Y'
+variable_safe_z_enable = True
+variable_safe_x = -128
+variable_safe_y = -128
+gcode = 
+
+[homing_override]
+axes = xyz
+gcode = 
+	{% set home_all = 'X' not in params and 'Y' not in params and 'Z' not in params %}
+	{% set z_hop_speed = (printer.configfile.settings['stepper_z'].homing_speed * 60) | float %}
+	{% set travel_speed = (printer.toolhead.max_velocity * 60) | float %}
+	{% set sensorless_variables = printer["gcode_macro _Sensorless_Homing_Variables"] %}
+	{% set z_hop_distance = sensorless_variables.z_hop_distance | float %}
+	{% set first_homed_axis = sensorless_variables.first_homed_axis | string %}
+	{% set safe_x = sensorless_variables.safe_x | float %}
+	{% set safe_y = sensorless_variables.safe_y | float %}
+	{% set safe_z = sensorless_variables.safe_z_enable | abs %}
+	{% set chamber = printer["heater_generic chamber"].target|int %}
+	
+	
+	{% if safe_x == -128 %}
+	{% set safe_x = (printer.configfile.settings.stepper_x.position_max) /2 %}
+	{% endif %}
+	
+	
+	
+	{% if safe_y == -128 %}
+	{% set safe_y = (printer.configfile.settings.stepper_y.position_max) /2 %}
+	{% endif %}
+	
+	
+	{% if z_hop_distance > 0 %}
+	{% if 'x' not in printer.toolhead.homed_axes and 'y' not in printer.toolhead.homed_axes %}
+	SET_KINEMATIC_POSITION Z=0
+	G0 Z{z_hop_distance} F{z_hop_speed}
+	{% endif %}
+	{% endif %}
+	
+	{% if first_homed_axis == 'X' %}
+	{% if home_all or 'X' in params %}
+	_HOME_X
+	{% endif %}
+	{% if home_all or 'Y' in params %}
+	_HOME_Y
+	{% endif %}
+	{% endif %}
+	
+	{% if first_homed_axis == 'Y' %}
+	{% if home_all or 'Y' in params %}
+	_HOME_Y
+	{% endif %}
+	{% if home_all or 'X' in params %}
+	_HOME_X
+	{% endif %}
+	{% endif %}
+	
+	{% if safe_z == 1 and (('Z' in params) or home_all) and ('Z' not in printer.toolhead.homed_axes) %}
+	{% if (printer.toolhead.position.z|float < 10) %}
+	SET_KINEMATIC_POSITION Z=0
+	G1 Z{z_hop_distance} F{z_hop_speed}
+	{% endif %}
+	G0 X{safe_x} Y{safe_y} F{travel_speed}
+	{% endif %}
+	
+	{% if home_all or 'Z' in params %}
+	
+	{% set extruder_target = printer.extruder.target|default(0) %}
+	{% set bed_target = printer.heater_bed.target|default(0) %}
+	{% set chamber_target = printer['heater_generic chamber'].target|default(0) %}
+	
+	G90
+	M106 S255
+	M109 S150
+	TURN_OFF_HEATERS
+	SET_FAN_SPEED FAN=cooling_fan SPEED=0
+	SET_FAN_SPEED FAN=auxiliary_cooling_fan SPEED=0
+	SET_FAN_SPEED FAN=chamber_circulation_fan SPEED=0
+	SET_GCODE_OFFSET Z=0 MOVE=0
+	{% set base_x  = printer['gcode_macro PRINTER_PARAM'].max_x_position/2 | float %}
+	{% set base_y  = printer['gcode_macro PRINTER_PARAM'].max_y_position/2 | float %}
+	{% set safe_x  = range((base_x - 10)|int, (base_x + 10)|int + 1) | random %}
+	{% set safe_y  = range((base_y - 10)|int, (base_y + 10)|int + 1) | random %}
+	G0 X{safe_x} Y{safe_y} F7800
+	G28 Z
+	G1 Z10 F2000
+	
+	
+	SET_HEATER_TEMPERATURE HEATER=bed TARGET={bed_target}
+	SET_HEATER_TEMPERATURE HEATER=extruder TARGET={extruder_target}
+	{% if chamber_target > 0 %}
+	SET_HEATER_TEMPERATURE HEATER=chamber TARGET={chamber_target}
+	{% endif %}
+	
+	{% endif %}
+
+[gcode_macro _HOME_XY]
+gcode = 
+	_HOME_Y
+	_HOME_X
+	_HOME_Y
+
+[gcode_macro save_zoffset]
+gcode = 
+	{% if printer.gcode_move.homing_origin.z < 0.5 %}
+	SAVE_VARIABLE VARIABLE=z_offset VALUE={printer.gcode_move.homing_origin.z}
+	{% endif %}
+
+[gcode_macro set_zoffset]
+gcode = 
+	{% set z = printer.save_variables.variables.z_offset|default(0) %}
+	SET_GCODE_OFFSET Z={z} MOVE=0
+
+[gcode_macro M106]
+gcode = 
+	{% set p = params.P|default(0)|int %}
+	
+	{% if p == 2 %}
+	{% if params.S is defined %}
+	SET_FAN_SPEED FAN=auxiliary_cooling_fan SPEED={(params.S|float / 255.0)}
+	{% else %}
+	SET_FAN_SPEED FAN=auxiliary_cooling_fan SPEED=1
+	{% endif %}
+	{% endif %}
+	
+	{% if p == 0 %}
+	{% if params.S is defined %}
+	SET_FAN_SPEED FAN=cooling_fan SPEED={(params.S|float / 255.0)}
+	
+	{% else %}
+	SET_FAN_SPEED FAN=cooling_fan SPEED=1
+	{% endif %}
+	{% endif %}
+	
+	{% if p == 3 %}
+	{% if params.S is defined %}
+	SET_FAN_SPEED FAN=chamber_circulation_fan SPEED={(params.S|float / 255.0)}
+	{% else %}
+	SET_FAN_SPEED FAN=chamber_circulation_fan SPEED=1
+	{% endif %}
+	{% endif %}
+	
+	{% if p == 4 %}
+	{% if params.S is defined %}
+	SET_PIN PIN=Polar_cooler VALUE={1 if (params.S|int / 255) > 0 else 0}
+	{% else %}
+	SET_PIN PIN=Polar_cooler VALUE=1
+	{% endif %}
+	{% endif %}
+
+[gcode_macro BEEP]
+gcode = 
+	{% set i = params.I|default(1)|int %}
+	{% set dur = params.DUR|default(100)|int %}
+	{% set beep = printer.save_variables.variables.beep|default(0) %}
+	
+	{% if beep == 1 %}
+	{% for iteration in range(i|int) %}
+	SET_PIN PIN=beeper VALUE=1
+	G4 P{dur}
+	SET_PIN PIN=beeper VALUE=0
+	G4 P{dur}
+	{% endfor %}
+	{% endif %}
+
+[gcode_macro beep_on]
+gcode = 
+	SAVE_VARIABLE VARIABLE=beep VALUE=1
+
+[gcode_macro beep_off]
+gcode = 
+	SAVE_VARIABLE VARIABLE=beep VALUE=0
+
+[gcode_macro LED_ON]
+gcode = 
+	SET_PIN PIN=caselight VALUE=1
+
+[gcode_macro LED_OFF]
+gcode = 
+	SET_PIN PIN=caselight VALUE=0
+
+[gcode_macro PRINT_START]
+gcode = 
+	{% set bedtemp = params.get('BED') | int %}
+	{% set hotendtemp = params.get('HOTEND') | int %}
+	{% set chambertemp = params.get('CHAMBER', 0) | int %}
+	
+	CLEAR_PAUSE
+	SET_HEATER_TEMPERATURE HEATER=bed TARGET={bedtemp}
+	SET_HEATER_TEMPERATURE HEATER="heater_generic chamber" TARGET={chambertemp}
+	{% if chambertemp != 0 %}
+	SET_FAN_SPEED FAN=chamber_circulation_fan SPEED=.5
+	{% endif %}
+	TEMPERATURE_WAIT SENSOR=bed MINIMUM={bedtemp - 2}
+	TEMPERATURE_WAIT SENSOR="heater_generic chamber" MINIMUM={chambertemp - 2}
+	SET_FAN_SPEED FAN=auxiliary_cooling_fan SPEED=0
+	
+	G28
+	CLEAN_NOZZLE HOTEND={hotendtemp}
+	SET_GCODE_OFFSET Z=0 MOVE=0
+	G28 Z
+	Z_TILT_ADJUST
+	G28 Z
+	BED_MESH_CALIBRATE profile=adaptive adaptive=1
+	set_zoffset
+	SET_HEATER_TEMPERATURE HEATER=extruder TARGET={hotendtemp}
+	TEMPERATURE_WAIT SENSOR=extruder MINIMUM={hotendtemp - 2} MAXIMUM={hotendtemp + 5}
+
+[gcode_macro PURGE_VARIABLES]
+description = Variables
+variable_purge_spd = 400
+variable_purge_temp_min = 200
+variable_purge_x = 85
+variable_purge_y = 287.5
+variable_purge_x_entry = 85
+variable_purge_y_entry = 270
+variable_z_min = 20
+variable_travel_speed = 300
+variable_entry_speed = 50
+variable_z_lift = 0
+variable_wipe_qty = 2
+variable_travel_spd_xy = 18000
+variable_travel_spd_z = 1000
+variable_wipe_spd_xy = 18000
+variable_brush_accel = 12000
+variable_purge_fan_speed = 0.4
+variable_wipe_fan_speed = 0.8
+variable_brush_y_position = 280
+variable_brush_start = 164
+variable_brush_width = 23
+variable_brush_depth = 6
+variable_pressure_release_time = 1000
+variable_part_cooling_fan = 1
+variable_purge_length_minimum = 20
+variable_purge_length_maximum = 80
+variable_purge_length = 40
+variable_purge_length_modifier = 1
+variable_purge_length_addition = 0
+gcode = 
+
+[gcode_macro BUCKET_PURGE]
+gcode = 
+	{% set vars = printer['gcode_macro PURGE_VARIABLES'] %}
+	
+	
+	
+	
+	
+	
+	SAVE_GCODE_STATE NAME=BUCKET_PURGE_state
+	
+	
+	
+	
+	
+	
+	{% if "xyz" not in printer.toolhead.homed_axes %}
+	RESPOND MSG="PURGE: Not homed! Home xyz before purging"
+	{% else %}
+	
+	
+	
+	
+	{% set backup_feedrate = printer.gcode_move.speed_factor %}
+	M220 S100
+	
+	
+	
+	
+	
+	{% set sequence_vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set filament_diameter = printer.configfile.config.extruder.filament_diameter|float %}
+	{% set filament_cross_section = (filament_diameter/2) ** 2 * 3.1415 %}
+	{% set from_tool = printer.mmu.last_tool %}
+	{% set to_tool = printer.mmu.tool %}
+	{% set pos = printer.gcode_move.gcode_position %}
+	{% set pos_max = printer.toolhead.axis_maximum %}
+	{% set backup_fan_speed = printer["fan_generic cooling_fan"].speed %}
+	
+	
+	{% set pv = printer.mmu.slicer_tool_map.purge_volumes %}
+	
+	
+	
+	
+	
+	{% if params.PURGE_LENGTH %}
+	{action_respond_info("PURGE: param PURGE_LENGTH provided")}
+	{% set purge_len = params.PURGE_LENGTH|float %}
+	{% elif from_tool == to_tool and to_tool >= 0 %}
+	{action_respond_info("PURGE: Tool didn't change (T%s > T%s), %s" % (from_tool, to_tool, "priming" if vars.purge_length_minimum else "skipping"))}
+	{% set purge_len = 0 %}
+	
+	{% elif pv %}
+	{% if from_tool < 0 and to_tool >= 0%}
+	{action_respond_info("PURGE: from tool unknown. Finding largest value for T? > T%d" % to_tool)}
+	{% set purge_vol = pv|map(attribute=to_tool)|max %}
+	{% elif to_tool < 0 %}
+	{action_respond_info("PURGE: tool(s) unknown. Finding largest value")}
+	{% set purge_vol = pv|map('max')|max %}
+	{% else %}
+	{% set purge_vol = pv[from_tool][to_tool]|float * vars.purge_length_modifier %}
+	{action_respond_info("PURGE: Swapped T%s > T%s" % (from_tool, to_tool))}
+	{% endif %}
+	
+	{% set purge_len = purge_vol / filament_cross_section %}
+	
+	{% set purge_len = purge_len + printer.mmu.extruder_filament_remaining + park_vars.retracted_length + vars.purge_length_addition %}
+	
+	{% else %}
+	{action_respond_info("PURGE: No toolmap or PURGE_LENGTH. Using default")}
+	{% set purge_len = vars.purge_length|float + printer.mmu.extruder_filament_remaining + park_vars.retracted_length %}
+	{% endif %}
+	
+	{% if purge_len < vars.purge_length_minimum %}
+	{action_respond_info("PURGE: Purge length too short, using minimum")}
+	{% endif %}
+	{% set purge_len = [purge_len,vars.purge_length_minimum]|max|round(0, 'ceil')|int %}
+	{action_respond_info("PURGE: Purging %dmm of filament" % (purge_len))}
+	
+	{% if purge_len|float > 0 %}
+	{% if not (printer.toolhead.position.x == vars.purge_x and printer.toolhead.position.y == vars.purge_y) %}
+	PURGE_PARK
+	{% endif%}
+	
+	
+	
+	
+	
+	{% if printer.extruder.temperature < vars.purge_temp_min - 2 %}
+	RESPOND MSG="PURGE: Heating Extruder to MIN"
+	{% if printer.extruder.target < vars.purge_temp_min %}
+	M109 S{vars.purge_temp_min}
+	{% else %}
+	TEMPERATURE_WAIT SENSOR=extruder MINIMUM={vars.purge_temp_min}
+	{% endif %}
+	{% endif %}
+	
+	
+	
+	
+	
+	
+	{% set blobs = (purge_len / vars.purge_length_maximum)|round(0, 'ceil')|int %}
+	{% set purge_per_blob = purge_len|float / blobs %}
+	{% set retracts_per_blob = (purge_per_blob / 40)|round(0, 'ceil')|int %}
+	{% set purge_per_retract = (purge_per_blob / retracts_per_blob)|int %}
+	{% set pulses_per_retract = (purge_per_blob / retracts_per_blob / 5)|round(0, 'ceil')|int %}
+	{% set pulses_per_blob = (purge_per_blob / 5)|round(0, 'ceil')|int %}
+	{% set purge_per_pulse = purge_per_blob / pulses_per_blob %}
+	
+	
+	
+	{% for blob in range(blobs) %}
+	RESPOND MSG={"'PURGE: Blob %d of %d (%.1fmm)'" % (blob + 1, blobs, purge_per_blob)}
+	
+	
+	
+	
+	G91
+	
+	M83
+	
+	
+	
+	
+	{% for pulse in range(pulses_per_blob) %}
+	
+	{% set purged_this_blob = pulse * purge_per_pulse %}
+	{% set speed = vars.purge_spd %}
+	
+	
+	G1 E{purge_per_pulse * 0.95} F{speed}
+	
+	G1 E{purge_per_pulse * 0.05} F{speed}
+	
+	
+	{% if pulse % pulses_per_retract == 0 and pulse > 0 %}
+	G1 E-2 F1800
+	G1 E2 F800
+	{% endif %}
+	{% endfor %}
+	
+	
+	G1 E-{park_vars.retracted_length} F{sequence_vars.retract_speed * 60}
+	
+	
+	
+	
+	
+	
+	G4 P{vars.pressure_release_time}
+	G1 X 30 F500
+	G1 X -30 F500
+	G1 X 30 F1200
+	G1 X -30 F1200
+	
+	
+	{% endfor %}
+	
+	{% endif %}
+	M220 S{(backup_feedrate * 100)|int}
+	{% endif %}
+	G90
+	G1 X125 F15000
+	SET_FAN_SPEED FAN=cooling_fan SPEED={backup_fan_speed}
+	RESTORE_GCODE_STATE NAME=BUCKET_PURGE_state MOVE=0
+	PURGE_WIPE
+
+[gcode_macro PURGE_WIPE]
+gcode = 
+	{% set vars = printer['gcode_macro PURGE_VARIABLES'] %}
+	{% set original_accel = printer.toolhead.max_accel %}
+	{% set original_minimum_cruise_ratio = printer.toolhead.minimum_cruise_ratio %}
+	{% set backup_fan_speed = printer["fan_generic partfan"].speed %}
+	
+	SAVE_GCODE_STATE NAME=PURGE_WIPE_state
+	
+	
+	G90
+	{% if not (printer.toolhead.position.x == vars.purge_x and printer.toolhead.position.y == vars.purge_y) %}
+	PURGE_PARK
+	{% endif%}
+	{% if vars.brush_accel > 0 %}
+	SET_VELOCITY_LIMIT ACCEL={vars.brush_accel} MINIMUM_CRUISE_RATIO=0.1
+	{% endif %}
+	SET_FAN_SPEED FAN=cooling_fan SPEED={vars.wipe_fan_speed}
+	
+	{% set random_y_start = range((vars.brush_Y_position - vars.brush_depth/2)|int, (vars.brush_Y_position + vars.brush_depth/2)|int) | random %}
+	G1 X{vars.brush_start} Y{random_y_start} F{vars.travel_spd_xy}
+	G1 Z -1.50 F900
+	
+	
+	{% for wipes in range(1, (vars.wipe_qty + 1)) %}
+	
+	{% set random_y = range(vars.brush_Y_position|int, (vars.brush_Y_position + vars.brush_depth)|int) | random %}
+	G1 X{vars.brush_start + vars.brush_width} Y{random_y} F{vars.wipe_spd_xy}
+	G1 X{vars.brush_start} F{vars.wipe_spd_xy}
+	
+	
+	{% set center_x = vars.brush_start + vars.brush_width / 2 %}
+	{% set center_y = vars.brush_Y_position + vars.brush_depth / 2 %}
+	{% set radius_x = vars.brush_width / 2 %}
+	{% set radius_y = vars.brush_depth / 2 %}
+	G1 X{center_x + radius_x} Y{center_y} F{vars.wipe_spd_xy / 2}
+	G1 X{center_x} Y{center_y + radius_y} F{vars.wipe_spd_xy / 2}
+	G1 X{center_x - radius_x} Y{center_y} F{vars.wipe_spd_xy / 2}
+	G1 X{center_x} Y{center_y - radius_y} F{vars.wipe_spd_xy / 2}
+	G1 X{center_x + radius_x} Y{center_y} F{vars.wipe_spd_xy / 2}
+	{% endfor %}
+	SET_FAN_SPEED FAN=cooling_fan SPEED={backup_fan_speed}
+	RESTORE_GCODE_STATE NAME=PURGE_WIPE_state
+
+[gcode_macro PURGE_PARK]
+gcode = 
+	{% set Px = printer["gcode_macro PURGE_VARIABLES"].purge_x|float %}
+	{% set Py = printer["gcode_macro PURGE_VARIABLES"].purge_y|float %}
+	{% set Pxe = printer["gcode_macro PURGE_VARIABLES"].purge_x_entry|float %}
+	{% set Pye = printer["gcode_macro PURGE_VARIABLES"].purge_y_entry|float %}
+	{% set St = printer["gcode_macro PURGE_VARIABLES"].travel_speed * 60 %}
+	{% set Se = printer["gcode_macro PURGE_VARIABLES"].entry_speed * 60 %}
+	{% set max_z = printer.configfile.config.stepper_z.position_max|float%}
+	{% set cur_z = printer.gcode_move.gcode_position.z|float %}
+	{% set z_min = printer["gcode_macro PURGE_VARIABLES"].z_min|float %}
+	{% set z_lift = printer["gcode_macro PURGE_VARIABLES"].z_lift|float %}
+	
+	
+	SAVE_GCODE_STATE NAME=PURGE_PARK_state
+	
+	{% if not (printer.toolhead.position.x == Px and printer.toolhead.position.y == Py) %}
+	{% set z_safe = [[cur_z + z_lift, z_min]|max, max_z]|min %}
+	
+	G90
+	G1 Z{z_safe} F{St}
+	G1 X{Pxe} Y{Pye} F{St}
+	G4 P1000
+	G1 X{Px} Y{Py} F{Se}
+	{% endif %}
+	
+	RESTORE_GCODE_STATE NAME=PURGE_PARK_state
+
+[gcode_macro EXIT_PARK]
+gcode = 
+	{% set Px = printer["gcode_macro PURGE_VARIABLES"].purge_x|float %}
+	{% set Py = printer["gcode_macro PURGE_VARIABLES"].purge_y|float %}
+	{% set Pxe = printer["gcode_macro PURGE_VARIABLES"].purge_x_entry|float %}
+	{% set Pye = printer["gcode_macro PURGE_VARIABLES"].purge_y_entry|float %}
+	{% set St = printer["gcode_macro PURGE_VARIABLES"].travel_speed * 60 %}
+	{% set Se = printer["gcode_macro PURGE_VARIABLES"].entry_speed * 60 %}
+	{% set cur_z = printer.gcode_move.gcode_position.z|float %}
+	{% set z_min = printer["gcode_macro PURGE_VARIABLES"].z_min|float %}
+	G90
+	{% if cur_z < z_min %}
+	G1 Z{z_min}
+	{% endif %}
+	{% if not (printer.toolhead.position.x == Px and printer.toolhead.position.y == Py) %}
+	G1 X{Px} Y{Py} F{Se}
+	{% endif %}
+	G1 X{Pxe} Y{Pye} F{Se}
+
+[gcode_macro PURGE]
+gcode = 
+	BUCKET_PURGE
+	EXIT_PARK
+
+[mcu mmu]
+serial = /dev/serial/by-id/usb-Klipper_QIDI_BOX_V2_1.1.3_350058001051353033353536-if00
+
+[board_pins mmu]
+mcu = mmu
+aliases = 
+	MMU_GEAR_UART={gear_uart_pin},
+	MMU_GEAR_STEP=PC14,
+	MMU_GEAR_DIR=PC13,
+	MMU_GEAR_ENABLE=PC15,
+	MMU_GEAR_DIAG={gear_diag_pin},
+	
+	MMU_GEAR_UART_1={gear_1_uart_pin},
+	MMU_GEAR_STEP_1=PB9,
+	MMU_GEAR_DIR_1=PB8,
+	MMU_GEAR_ENABLE_1=PC0,
+	MMU_GEAR_DIAG_1={gear_1_diag_pin},
+	
+	MMU_GEAR_UART_2={gear_2_uart_pin},
+	MMU_GEAR_STEP_2=PC12,
+	MMU_GEAR_DIR_2=PC11,
+	MMU_GEAR_ENABLE_2=PD2,
+	MMU_GEAR_DIAG_2={gear_2_diag_pin},
+	
+	MMU_GEAR_UART_3={gear_3_uart_pin},
+	MMU_GEAR_STEP_3=PC8,
+	MMU_GEAR_DIR_3=PB2,
+	MMU_GEAR_ENABLE_3=PC10,
+	MMU_GEAR_DIAG_3={gear_3_diag_pin},
+	
+	MMU_SEL_UART={selector_uart_pin},
+	MMU_SEL_STEP={selector_step_pin},
+	MMU_SEL_DIR={selector_dir_pin},
+	MMU_SEL_ENABLE={selector_enable_pin},
+	MMU_SEL_DIAG={selector_diag_pin},
+	MMU_SEL_ENDSTOP={selector_endstop_pin},
+	MMU_SEL_SERVO={selector_servo_pin},
+	
+	MMU_ENCODER={encoder_pin},
+	MMU_GATE_SENSOR=PB1,
+	MMU_NEOPIXEL={neopixel_pin},
+	
+	MMU_PRE_GATE_0=PA0,
+	MMU_PRE_GATE_1=PB3,
+	MMU_PRE_GATE_2=PA13,
+	MMU_PRE_GATE_3=PA7,
+	MMU_PRE_GATE_4={pre_gate_4_pin},
+	MMU_PRE_GATE_5={pre_gate_5_pin},
+	MMU_PRE_GATE_6={pre_gate_6_pin},
+	MMU_PRE_GATE_7={pre_gate_7_pin},
+	MMU_PRE_GATE_8={pre_gate_8_pin},
+	MMU_PRE_GATE_9={pre_gate_9_pin},
+	MMU_PRE_GATE_10={pre_gate_10_pin},
+	MMU_PRE_GATE_11={pre_gate_11_pin},
+	
+	MMU_POST_GEAR_0={gear_sensor_0_pin},
+	MMU_POST_GEAR_1={gear_sensor_1_pin},
+	MMU_POST_GEAR_2={gear_sensor_2_pin},
+	MMU_POST_GEAR_3={gear_sensor_3_pin},
+	MMU_POST_GEAR_4={gear_sensor_4_pin},
+	MMU_POST_GEAR_5={gear_sensor_5_pin},
+	MMU_POST_GEAR_6={gear_sensor_6_pin},
+	MMU_POST_GEAR_7={gear_sensor_7_pin},
+	MMU_POST_GEAR_8={gear_sensor_8_pin},
+	MMU_POST_GEAR_9={gear_sensor_9_pin},
+	MMU_POST_GEAR_10={gear_sensor_10_pin},
+	MMU_POST_GEAR_11={gear_sensor_11_pin},
+	
+	MMU_ESPOOLER_RWD_0={espooler_rwd_0_pin},
+	MMU_ESPOOLER_FWD_0={espooler_fwd_0_pin},
+	MMU_ESPOOLER_EN_0={espooler_en_0_pin},
+	MMU_ESPOOLER_TRIG_0=,
+	MMU_ESPOOLER_RWD_1={espooler_rwd_1_pin},
+	MMU_ESPOOLER_FWD_1={espooler_fwd_1_pin},
+	MMU_ESPOOLER_EN_1={espooler_en_1_pin},
+	MMU_ESPOOLER_TRIG_1=,
+	MMU_ESPOOLER_RWD_2={espooler_rwd_2_pin},
+	MMU_ESPOOLER_FWD_2={espooler_fwd_2_pin},
+	MMU_ESPOOLER_EN_2={espooler_en_2_pin},
+	MMU_ESPOOLER_TRIG_2=,
+	MMU_ESPOOLER_RWD_3={espooler_rwd_3_pin},
+	MMU_ESPOOLER_FWD_3={espooler_fwd_3_pin},
+	MMU_ESPOOLER_EN_3={espooler_en_3_pin},
+	MMU_ESPOOLER_TRIG_3=,
+
+[gcode_macro _MMU_CUT_TIP]
+description = Cut filament by pressing the cutter on a pin with a horizontal movement
+variable_output_park_pos = 0
+gcode = 
+	{% set final_eject = params.FINAL_EJECT|default(0)|int %}
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set pin_loc_x, pin_loc_y = vars.pin_loc_xy|map('float') %}
+	{% set pin_park_dist = vars['pin_park_dist']|float %}
+	{% set retract_length = vars['retract_length']|float %}
+	{% set simple_tip_forming = vars['simple_tip_forming']|default(true)|lower == 'true' %}
+	{% set blade_pos = vars['blade_pos']|float %}
+	{% set rip_length = vars['rip_length']|float %}
+	{% set pushback_length = vars['pushback_length']|float %}
+	{% set pushback_dwell_time = vars['pushback_dwell_time']|int %}
+	{% set extruder_move_speed = vars['extruder_move_speed']|float %}
+	{% set travel_speed = vars['travel_speed']|float %}
+	{% set restore_position = vars['restore_position']|default(true)|lower == 'true' %}
+	{% set extruder_park_pos = blade_pos + rip_length %}
+	{% set cutting_axis = vars['cutting_axis'] %}
+	
+	{% if cutting_axis == "x" %}
+	{% set pin_park_x_loc = pin_loc_x + pin_park_dist %}
+	{% set pin_park_y_loc = pin_loc_y %}
+	{% else %}
+	{% set pin_park_y_loc = pin_loc_y + pin_park_dist %}
+	{% set pin_park_x_loc = pin_loc_x %}
+	{% endif %}
+	
+	{% if "xy" not in printer.toolhead.homed_axes %}
+	MMU_LOG MSG="Automatically homing XY"
+	G28 X Y
+	_CUT_TIP_MOVE_IN_BOUNDS
+	{% endif %}
+	
+	SAVE_GCODE_STATE NAME=_MMU_CUT_TIP_state
+	
+	G90
+	M83
+	G92 E0
+	
+	
+	{% set effective_retract_length = retract_length - printer.mmu.extruder_filament_remaining - park_vars.retracted_length %}
+	{% if effective_retract_length > 0 %}
+	MMU_LOG MSG="Retracting filament {effective_retract_length|round(1)}mm prior to cut"
+	G1 E-{effective_retract_length} F{extruder_move_speed * 60}
+	{% if simple_tip_forming %}
+	G1 E{effective_retract_length / 2} F{extruder_move_speed * 60}
+	G1 E-{effective_retract_length / 2} F{extruder_move_speed * 60}
+	{% endif %}
+	{% endif %}
+	
+	
+	_CUT_TIP_ADJUST_CURRENT
+	_CUT_TIP_MOVE_TO_CUTTER_PIN PIN_PARK_X_LOC={pin_park_x_loc} PIN_PARK_Y_LOC={pin_park_y_loc}
+	_CUT_TIP_GANTRY_SERVO_DOWN
+	_CUT_TIP_DO_CUT_MOTION PIN_PARK_X_LOC={pin_park_x_loc} PIN_PARK_Y_LOC={pin_park_y_loc} RIP_LENGTH={rip_length}
+	_CUT_TIP_GANTRY_SERVO_UP
+	_CUT_TIP_RESTORE_CURRENT
+	_MMU_EVENT EVENT="filament_cut"
+	
+	
+	{% set effective_pushback_length = [pushback_length, retract_length - printer.mmu.extruder_filament_remaining - park_vars.retracted_length]|min %}
+	{% if effective_pushback_length > 0 %}
+	MMU_LOG MSG="Pushing filament fragment back {effective_pushback_length|round(1)}mm after cut"
+	G1 E{effective_pushback_length} F{extruder_move_speed * 60}
+	G4 P{pushback_dwell_time}
+	G1 E-{effective_pushback_length} F{extruder_move_speed * 60}
+	{% endif %}
+	
+	
+	{% if final_eject %}
+	G92 E0
+	G1 E-80 F{extruder_move_speed * 60}
+	{% endif %}
+	
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_CUT_TIP VARIABLE=output_park_pos VALUE={extruder_park_pos}
+	
+	
+	RESTORE_GCODE_STATE NAME=_MMU_CUT_TIP_state MOVE={1 if restore_position else 0} MOVE_SPEED={travel_speed}
+
+[gcode_macro _CUT_TIP_ADJUST_CURRENT]
+description = Helper to optionally increase X/Y stepper current prior to cut
+variable_current_map = {}
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set cut_axis_steppers = (vars['cut_axis_steppers'] | default('')).split(',') | map('trim') | list %}
+	{% set cut_stepper_current = vars['cut_stepper_current'] | default(100) | int %}
+	{% set tmc_types = ["tmc2209", "tmc2130", "tmc2208", "tmc2660", "tmc5160", "tmc2240"] %}
+	
+	{% if not current_map %}
+	{% set ns = namespace(run_current={}) %}
+	{% if cut_stepper_current != 100 %}
+	{% for stepper in cut_axis_steppers %}
+	{% for tmc in tmc_types %}
+	{% set fullname = tmc ~ ' ' ~ stepper %}
+	{% if printer[fullname] is defined %}
+	
+	{% set cur_rc = printer[fullname].run_current %}
+	{% if ns.run_current.update({stepper: cur_rc}) %}{% endif %}
+	{% set new_rc = cur_rc * cut_stepper_current | float / 100 %}
+	MMU_LOG MSG="Adjusting {stepper} current"
+	SET_TMC_CURRENT STEPPER={stepper} CURRENT={new_rc}
+	{% endif %}
+	{% endfor %}
+	{% endfor %}
+	{% endif %}
+	
+	SET_GCODE_VARIABLE MACRO=_CUT_TIP_ADJUST_CURRENT VARIABLE=current_map VALUE="{ns.run_current}"
+	{% endif %}
+
+[gcode_macro _CUT_TIP_RESTORE_CURRENT]
+description = Helper to restore X/Y stepper current after cutting action
+gcode = 
+	{% set current_vars = printer['gcode_macro _CUT_TIP_ADJUST_CURRENT'] %}
+	{% set current_map = current_vars['current_map'] %}
+	
+	{% if current_map %}
+	{% for stepper, current in current_map.items() %}
+	MMU_LOG MSG="Restoring {stepper} current"
+	SET_TMC_CURRENT STEPPER={stepper} CURRENT={current}
+	{% endfor %}
+	{% endif %}
+	
+	SET_GCODE_VARIABLE MACRO=_CUT_TIP_ADJUST_CURRENT VARIABLE=current_map VALUE="{{}}"
+
+[gcode_macro _CUT_TIP_MOVE_IN_BOUNDS]
+description = Helper to move the toolhead to a legal position after homing
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set travel_speed = vars['travel_speed']|float %}
+	
+	{% set pos = printer.gcode_move.gcode_position %}
+	{% set axis_minimum = printer.toolhead.axis_minimum %}
+	{% set axis_maximum = printer.toolhead.axis_maximum %}
+	{% set x = [axis_minimum.x, [axis_maximum.x, pos.x]|min]|max %}
+	{% set y = [axis_minimum.y, [axis_maximum.y, pos.y]|min]|max %}
+	
+	MMU_LOG MSG="Warning: Klipper reported out of range gcode position (x:{pos.x}, y:{pos.y})! Adjusted to (x:{x}, y:{y}) to prevent move failure" ERROR=1
+	G1 X{x} Y{y} F{travel_speed * 60}
+
+[gcode_macro _CUT_TIP_MOVE_TO_CUTTER_PIN]
+description = Helper to move the toolhead to the target pin in either safe or faster way, depending on toolhead clearance
+gcode = 
+	{% set pin_park_x_loc = params.PIN_PARK_X_LOC|float %}
+	{% set pin_park_y_loc = params.PIN_PARK_Y_LOC|float %}
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	
+	{% set safe_margin_x, safe_margin_y = vars.safe_margin_xy|map('float') %}
+	{% set travel_speed = vars['travel_speed']|float %}
+	{% set cutting_axis = vars['cutting_axis'] %}
+	
+	{% if ((printer.gcode_move.gcode_position.x - pin_park_x_loc)|abs < safe_margin_x) or ((printer.gcode_move.gcode_position.y - pin_park_y_loc)|abs < safe_margin_y) %}
+	
+	{% if cutting_axis == "x" %}
+	G1 X{pin_park_x_loc} F{travel_speed * 60}
+	G1 Y{pin_park_y_loc} F{travel_speed * 60}
+	{% else %}
+	G1 Y{pin_park_y_loc} F{travel_speed * 60}
+	G1 X{pin_park_x_loc} F{travel_speed * 60}
+	{% endif %}
+	{% else %}
+	G1 X{pin_park_x_loc} Y{pin_park_y_loc} F{travel_speed * 60}
+	{% endif %}
+
+[gcode_macro _CUT_TIP_DO_CUT_MOTION]
+description = Helper to do a single cut movement
+gcode = 
+	{% set pin_park_x_loc = params.PIN_PARK_X_LOC | float %}
+	{% set pin_park_y_loc = params.PIN_PARK_Y_LOC | float %}
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set cutting_axis = vars['cutting_axis'] %}
+	
+	{% set pin_loc = vars['pin_loc_compressed']|default(-999)|float %}
+	{% if pin_loc != -999 %}
+	
+	{% if cutting_axis == "x" %}
+	{% set pin_loc_compressed_x = pin_loc %}
+	{% set pin_loc_compressed_y = pin_park_y_loc %}
+	{% else %}
+	{% set pin_loc_compressed_x = pin_park_x_loc %}
+	{% set pin_loc_compressed_y = pin_loc %}
+	{% endif %}
+	{% else %}
+	
+	{% set pin_loc_compressed_x, pin_loc_compressed_y = vars.pin_loc_compressed_xy|map('float') %}
+	{% endif %}
+	
+	{% set cut_fast_move_fraction = vars['cut_fast_move_fraction']|float %}
+	{% set cut_fast_move_speed = vars['cut_fast_move_speed']|float %}
+	{% set cut_slow_move_speed = vars['cut_slow_move_speed']|float %}
+	{% set cut_dwell_time = vars['cut_dwell_time']|float %}
+	{% set evacuate_speed = vars['evacuate_speed']|float %}
+	{% set rip_length = vars['rip_length']|float %}
+	{% set rip_speed = vars['rip_speed']|float %}
+	
+	
+	{% set fast_slow_transition_loc_x = (pin_loc_compressed_x - pin_park_x_loc) * cut_fast_move_fraction + pin_park_x_loc|float %}
+	{% set fast_slow_transition_loc_y = (pin_loc_compressed_y - pin_park_y_loc) * cut_fast_move_fraction + pin_park_y_loc|float %}
+	G1 X{fast_slow_transition_loc_x} Y{fast_slow_transition_loc_y} F{cut_fast_move_speed * 60}
+	G1 X{pin_loc_compressed_x} Y{pin_loc_compressed_y} F{cut_slow_move_speed * 60}
+	
+	G4 P{cut_dwell_time}
+	{% if rip_length > 0 %}
+	G1 E-{rip_length} F{rip_speed * 60}
+	{% endif %}
+	
+	G1 X{pin_park_x_loc} Y{pin_park_y_loc} F{evacuate_speed * 60}
+
+[gcode_macro _CUT_TIP_GANTRY_SERVO_DOWN]
+description = Operate optional gantry servo operated pin
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set gantry_servo_enabled = vars['gantry_servo_enabled']|default(true)|lower == 'true' %}
+	{% set angle = vars['gantry_servo_down_angle']|float %}
+	
+	{% if gantry_servo_enabled %}
+	SET_SERVO SERVO=mmu_gantry_servo ANGLE={angle}
+	G4 P500
+	{% endif %}
+
+[gcode_macro _CUT_TIP_GANTRY_SERVO_UP]
+description = Operate optional gantry servo operated pin
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set gantry_servo_enabled = vars['gantry_servo_enabled']|default(true)|lower == 'true' %}
+	{% set angle = vars['gantry_servo_up_angle']|float %}
+	
+	{% if gantry_servo_enabled %}
+	SET_SERVO SERVO=mmu_gantry_servo ANGLE={angle} DURATION=0.5
+	{% endif %}
+
+[gcode_macro _MMU_FORM_TIP]
+description = Standalone macro that mimics Superslicer process
+gcode = 
+	{% set final_eject = params.FINAL_EJECT|default(0)|int %}
+	{% set vars = printer['gcode_macro _MMU_FORM_TIP_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set unloading_speed_start = vars['unloading_speed_start']|int %}
+	{% set unloading_speed = vars['unloading_speed']|int %}
+	{% set ramming_volume = vars['ramming_volume']|float %}
+	{% set ramming_volume_standalone = vars['ramming_volume_standalone']|float %}
+	{% set cooling_tube_length = vars['cooling_tube_length']|float %}
+	{% set cooling_tube_position = vars['cooling_tube_position']|float %}
+	{% set initial_cooling_speed = vars['initial_cooling_speed']|int %}
+	{% set final_cooling_speed = vars['final_cooling_speed']|int %}
+	{% set cooling_moves = vars['cooling_moves']|int %}
+	{% set toolchange_temp = vars['toolchange_temp']|default(0)|int %}
+	{% set use_skinnydip = vars['use_skinnydip']|default(false)|lower == 'true' %}
+	{% set use_fast_skinnydip = vars['use_fast_skinnydip']|default(false)|lower == 'true' %}
+	{% set skinnydip_distance = vars['skinnydip_distance']|float %}
+	{% set dip_insertion_speed = vars['dip_insertion_speed']|int %}
+	{% set dip_extraction_speed = vars['dip_extraction_speed']|int %}
+	{% set melt_zone_pause = vars['melt_zone_pause']|default(0)|int %}
+	{% set cooling_zone_pause = vars['cooling_zone_pause']|default(0)|int %}
+	{% set extruder_eject_speed = vars['extruder_eject_speed']|int %}
+	{% set parking_distance = vars['parking_distance']|default(0)|float %}
+	{% set orig_temp = printer.extruder.target %}
+	{% set next_temp = params.NEXT_TEMP|default(orig_temp)|int %}
+	
+	
+	{% set runout = printer.mmu.runout %}
+	{% set printing = printer.mmu.print_state == 'printing' %}
+	
+	SAVE_GCODE_STATE NAME=MMU_FORM_TIP_state
+	
+	G91
+	M83
+	G92 E0
+	
+	
+	
+	{% set ramming_volume = ramming_volume_standalone if not printing else ramming_volume %}
+	{% if ramming_volume > 0 %}
+	{% set ratio = ramming_volume / 23.0 %}
+	G1 E{0.5784 * ratio} F299
+	G1 E{0.5834 * ratio} F302
+	G1 E{0.5918 * ratio} F306
+	G1 E{0.6169 * ratio} F319
+	G1 E{0.3393 * ratio} F350
+	G1 E{0.3363 * ratio} F350
+	G1 E{0.7577 * ratio} F392
+	G1 E{0.8382 * ratio} F434
+	G1 E{0.7776 * ratio} F469
+	G1 E{0.1293 * ratio} F469
+	G1 E{0.9673 * ratio} F501
+	G1 E{1.0176 * ratio} F527
+	G1 E{0.5956 * ratio} F544
+	G1 E{0.4555 * ratio} F544
+	G1 E{1.0662 * ratio} F552
+	{% endif %}
+	
+	
+	
+	{% set total_retraction_distance = cooling_tube_position - printer.mmu.extruder_filament_remaining - park_vars.retracted_length + cooling_tube_length - 15 %}
+	G1 E-15 F{1.0 * unloading_speed_start * 60}
+	{% if total_retraction_distance > 0 %}
+	G1 E-{(0.7 * total_retraction_distance)|round(2)} F{1.0 * unloading_speed * 60}
+	G1 E-{(0.2 * total_retraction_distance)|round(2)} F{0.5 * unloading_speed * 60}
+	G1 E-{(0.1 * total_retraction_distance)|round(2)} F{0.3 * unloading_speed * 60}
+	{% endif %}
+	
+	
+	{% if toolchange_temp > 0 %}
+	M104 S{toolchange_temp}
+	{% if not use_fast_skinnydip %}
+	_WAIT_FOR_TEMP
+	{% endif %}
+	{% endif %}
+	
+	
+	
+	{% set speed_inc = (final_cooling_speed - initial_cooling_speed) / (2 * cooling_moves - 1) %}
+	{% for move in range(cooling_moves) %}
+	{% set speed = initial_cooling_speed + speed_inc * move * 2 %}
+	G1 E{cooling_tube_length} F{speed * 60}
+	G1 E-{cooling_tube_length} F{(speed + speed_inc) * 60}
+	{% endfor %}
+	
+	
+	{% if toolchange_temp > 0 and use_skinnydip and use_fast_skinnydip %}
+	_WAIT_FOR_TEMP
+	{% endif %}
+	
+	
+	
+	{% if use_skinnydip %}
+	G1 E{skinnydip_distance} F{dip_insertion_speed * 60}
+	G4 P{melt_zone_pause}
+	G1 E-{skinnydip_distance} F{dip_extraction_speed * 60}
+	G4 P{cooling_zone_pause}
+	{% endif %}
+	
+	
+	
+	M104 S{next_temp}
+	
+	
+	
+	{% if final_eject %}
+	G92 E0
+	G1 E-80 F{extruder_eject_speed * 60}
+	{% elif parking_distance > 0 %}
+	G90
+	M82
+	G1 E-{parking_distance} F{extruder_eject_speed * 60}
+	{% endif %}
+	
+	
+	RESTORE_GCODE_STATE NAME=MMU_FORM_TIP_state
+
+[gcode_macro _WAIT_FOR_TEMP]
+description = Helper function for fan assisted extruder temp reduction
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_FORM_TIP_VARS'] %}
+	{% set toolchange_temp = vars['toolchange_temp']|default(0)|int %}
+	{% set toolchange_use_fan = vars['toolchange_fan_assist']|default(false)|lower == 'true' %}
+	{% set toolchange_fan_speed = vars['toolchange_fan_speed']|default(50)|int %}
+	{% set toolchange_fan = vars['toolchange_fan_name']|default('')|string %}
+	
+	MMU_LOG MSG='{"Waiting for extruder temp %d\u00B0C..." % toolchange_temp}'
+	{% if toolchange_use_fan %}
+	{% if printer.fan is defined or printer[toolchange_fan] is defined %}
+	{% set orig_fan_speed = printer[toolchange_fan].speed if printer[toolchange_fan] is defined else printer.fan.speed %}
+	M106 S{(toolchange_fan_speed / 100 * 255)|int}
+	M109 S{toolchange_temp}
+	M106 S{(orig_fan_speed * 255)|int}
+	{% else %}
+	MMU_LOG MSG="Warning: Printer part fan is not defined. Ignoring 'toolchange_use_fan' option" ERROR=1
+	M109 S{toolchange_temp}
+	{% endif %}
+	{% else %}
+	M109 S{toolchange_temp}
+	{% endif %}
+
+[mmu_machine]
+num_gates = 4
+mmu_vendor = Other
+mmu_version = 1.0
+selector_type = VirtualSelector
+variable_bowden_lengths = 0
+variable_rotation_distances = 0
+require_bowden_move = 1
+filament_always_gripped = 1
+environment_sensor = 
+homing_extruder = 1
+
+[stepper_mmu_gear]
+step_pin = mmu:MMU_GEAR_STEP
+dir_pin = mmu:MMU_GEAR_DIR
+enable_pin = !mmu:MMU_GEAR_ENABLE
+rotation_distance = 13.6
+gear_ratio = 1:1
+microsteps = 16
+full_steps_per_rotation = 200
+
+[stepper_mmu_gear_1]
+step_pin = mmu:MMU_GEAR_STEP_1
+dir_pin = mmu:MMU_GEAR_DIR_1
+enable_pin = !mmu:MMU_GEAR_ENABLE_1
+
+[stepper_mmu_gear_2]
+step_pin = mmu:MMU_GEAR_STEP_2
+dir_pin = mmu:MMU_GEAR_DIR_2
+enable_pin = !mmu:MMU_GEAR_ENABLE_2
+
+[stepper_mmu_gear_3]
+step_pin = mmu:MMU_GEAR_STEP_3
+dir_pin = mmu:MMU_GEAR_DIR_3
+enable_pin = !mmu:MMU_GEAR_ENABLE_3
+
+[mmu_sensors]
+pre_gate_switch_pin_0 = !mmu:MMU_PRE_GATE_0
+pre_gate_switch_pin_1 = !mmu:MMU_PRE_GATE_1
+pre_gate_switch_pin_2 = !mmu:MMU_PRE_GATE_2
+pre_gate_switch_pin_3 = !mmu:MMU_PRE_GATE_3
+pre_gate_switch_pin_4 = ^mmu:MMU_PRE_GATE_4
+pre_gate_switch_pin_5 = ^mmu:MMU_PRE_GATE_5
+pre_gate_switch_pin_6 = ^mmu:MMU_PRE_GATE_6
+pre_gate_switch_pin_7 = ^mmu:MMU_PRE_GATE_7
+pre_gate_switch_pin_8 = ^mmu:MMU_PRE_GATE_8
+pre_gate_switch_pin_9 = ^mmu:MMU_PRE_GATE_9
+pre_gate_switch_pin_10 = ^mmu:MMU_PRE_GATE_10
+pre_gate_switch_pin_11 = ^mmu:MMU_PRE_GATE_11
+post_gear_switch_pin_0 = ^mmu:MMU_POST_GEAR_0
+post_gear_switch_pin_1 = ^mmu:MMU_POST_GEAR_1
+post_gear_switch_pin_2 = ^mmu:MMU_POST_GEAR_2
+post_gear_switch_pin_3 = ^mmu:MMU_POST_GEAR_3
+post_gear_switch_pin_4 = ^mmu:MMU_POST_GEAR_4
+post_gear_switch_pin_5 = ^mmu:MMU_POST_GEAR_5
+post_gear_switch_pin_6 = ^mmu:MMU_POST_GEAR_6
+post_gear_switch_pin_7 = ^mmu:MMU_POST_GEAR_7
+post_gear_switch_pin_8 = ^mmu:MMU_POST_GEAR_8
+post_gear_switch_pin_9 = ^mmu:MMU_POST_GEAR_9
+post_gear_switch_pin_10 = ^mmu:MMU_POST_GEAR_10
+post_gear_switch_pin_11 = ^mmu:MMU_POST_GEAR_11
+gate_switch_pin = ^!mmu:MMU_GATE_SENSOR
+sync_feedback_tension_pin = 
+sync_feedback_compression_pin = 
+extruder_switch_pin = !THR:PA1
+toolhead_switch_pin = 
+
+[mmu_led_effect mmu_breathing_red]
+layers = breathing 4 0 top (1,0,0)
+
+[mmu_led_effect mmu_white_slow]
+define_on = exit, status
+layers = breathing 1.0 0 top (0.8,0.8,0.8)
+
+[mmu_led_effect mmu_white_fast]
+define_on = exit, status
+layers = breathing 0.6 0 top (0.2,0.2,0.2)
+
+[mmu_led_effect mmu_blue_clockwise_slow]
+define_on = gates, status
+layers = chase .5 .5 top (0,0,1), (0,0,.4)
+
+[mmu_led_effect mmu_blue_clockwise_fast]
+define_on = gates, status
+layers = chase 1 .5 top (0,0,1), (0,0,.4)
+
+[mmu_led_effect mmu_blue_anticlock_slow]
+define_on = gates, status
+layers = chase -.5 .5 top (0,0,1), (0,0,.4)
+
+[mmu_led_effect mmu_blue_anticlock_fast]
+define_on = gates, status
+layers = chase -1 .5 top (0,0,1), (0,0,.4)
+
+[mmu_led_effect mmu_strobe]
+layers = strobe    1 1.5 add (1,1,1)
+	breathing 2 0   difference (0.95,0,0)
+	static    0 0   top (1,0,0)
+
+[mmu_led_effect mmu_static_green]
+define_on = gates
+layers = static 0 0 top (0,0.5,0)
+
+[mmu_led_effect mmu_ready_green]
+define_on = gates
+layers = breathing 2 0 subtract (0,0.35,0)
+	static 0 0 top (0,0.5,0)
+
+[mmu_led_effect mmu_static_orange]
+define_on = gates
+layers = static 0 0 top (0.5,0.2,0)
+
+[mmu_led_effect mmu_ready_orange]
+define_on = gates
+layers = breathing 2 0 subtract (0.35,0.14,0)
+	static 0 0 top (0.5,0.2,0)
+
+[mmu_led_effect mmu_ready_orange2]
+define_on = gates
+layers = breathing 2 0 top (0.175,0.07,0)
+
+[mmu_led_effect mmu_static_blue]
+define_on = gates
+layers = static 0 0 top (0,0,1)
+
+[mmu_led_effect mmu_ready_blue]
+define_on = gates
+layers = breathing 2 0 add (0,0,0.5)
+	static 0 0 top (0,0,0)
+
+[mmu_led_effect mmu_static_black]
+define_on = gates
+layers = static 0 0 top (0,0,0)
+
+[mmu_led_effect mmu_rainbow]
+define_on = entry, exit, status
+layers = gradient  0.8  0.5 add (0.3, 0.0, 0.0), (0.0, 0.3, 0.0), (0.0, 0.0, 0.3)
+
+[mmu_led_effect mmu_sparkle]
+define_on = exit
+layers = twinkle 8 0.15 top (0.3,0.3,0.3), (0.4,0,0.25)
+
+[save_variables]
+filename = /home/mks/printer_data/config/saved_variables.cfg
+
+[extruder]
+max_extrude_only_distance = 1000.0
+max_extrude_cross_section = 500
+step_pin = TH:PB9
+dir_pin = !TH:PB8
+enable_pin = !TH:PC15
+rotation_distance = 53.7
+gear_ratio = 1517:170
+microsteps = 16
+full_steps_per_rotation = 200
+nozzle_diameter = 0.400
+filament_diameter = 1.75
+min_temp = 0
+max_temp = 375
+min_extrude_temp = 175
+smooth_time = 0.000001
+heater_pin = TH:PB15
+sensor_type = MAX6675
+sensor_pin = TH:PB12
+spi_bus = spi2
+spi_speed = 2000000
+max_power = 1
+control = pid
+pid_kp = 33.555
+pid_ki = 4.76
+pid_kd = 59.141
+pressure_advance = 0.032
+pressure_advance_smooth_time = 0.03
+instantaneous_corner_velocity = 10.000
+max_extrude_only_velocity = 5000
+max_extrude_only_accel = 5000
+
+[respond]
+
+[display_status]
+
+[pause_resume]
+
+[virtual_sdcard]
+path = ~/printer_data/gcodes
+
+[gcode_macro _MMU_SOFTWARE_VARS]
+description = Happy Hare optional configuration for print start/end checks
+gcode = 
+variable_user_pre_initialize_extension = ''
+variable_home_mmu = False
+variable_check_gates = True
+variable_load_initial_tool = True
+variable_automap_strategy = "none"
+variable_user_print_end_extension = ''
+variable_unload_tool = True
+variable_reset_ttg = False
+variable_dump_stats = True
+
+[gcode_macro _MMU_STATE_VARS]
+description = Happy Hare configuration for state change hooks
+gcode = 
+variable_user_action_changed_extension = ''
+variable_user_print_state_changed_extension = ''
+variable_user_mmu_event_extension = ''
+variable_servo_down_limit = 5000
+variable_cutter_blade_limit = 3000
+
+[gcode_macro _MMU_SEQUENCE_VARS]
+description = Happy Hare sequence macro configuration variables
+gcode = 
+variable_enable_park_printing = 'toolchange,runout,load,unload,complete,pause,cancel'
+variable_enable_park_standalone = 'toolchange,load,unload,pause,cancel'
+variable_enable_park_disabled = 'pause,cancel'
+variable_min_toolchange_z = 1.0
+variable_park_toolchange = -999, -999, 1,  5, 2
+variable_park_runout = -999, -999, 1,  5, 2
+variable_park_pause = 50,   50,   5,  0, 2
+variable_park_cancel = -999, -999, 10, 0, 5
+variable_park_complete = 50,   50,   10, 0, 5
+variable_pre_unload_position = -999, -999, 0
+variable_post_form_tip_position = -999, -999, 0
+variable_pre_load_position = -999, -999, 0
+variable_restore_xy_pos = "last"
+variable_park_travel_speed = 200
+variable_park_lift_speed = 15
+variable_retract_speed = 30
+variable_unretract_speed = 30
+variable_user_park_move_macro = 'PURGE_PARK'
+variable_auto_home = True
+variable_timelapse = False
+variable_user_mmu_error_extension = ''
+variable_user_pre_unload_extension = ''
+variable_user_post_form_tip_extension = ''
+variable_user_post_unload_extension = ''
+variable_user_pre_load_extension = 'PURGE_PARK'
+variable_user_post_load_extension = 'BUCKET_PURGE'
+
+[gcode_macro _MMU_CUT_TIP_VARS]
+description = Happy Hare toolhead tip cutting macro configuration variables
+gcode = 
+variable_restore_position = False
+variable_blade_pos = 52
+variable_retract_length = 10
+variable_simple_tip_forming = True
+variable_cut_axis_steppers = 'stepper_x, stepper_y'
+variable_cut_stepper_current = 100
+variable_cutting_axis = "x"
+variable_pin_loc_xy = 11, 0.5
+variable_pin_park_dist = 11.5
+variable_pin_loc_compressed_xy = -0.5, 0.5
+variable_rip_length = 1.0
+variable_rip_speed = 3
+variable_pushback_length = 3.0
+variable_pushback_dwell_time = 0
+variable_travel_speed = 150
+variable_cut_fast_move_speed = 32
+variable_cut_slow_move_speed = 8
+variable_evacuate_speed = 150
+variable_cut_dwell_time = 50
+variable_cut_fast_move_fraction = 1.0
+variable_extruder_move_speed = 25
+variable_safe_margin_xy = 60, 60
+variable_gantry_servo_enabled = False
+variable_gantry_servo_down_angle = 55
+variable_gantry_servo_up_angle = 180
+
+[gcode_macro _MMU_FORM_TIP_VARS]
+description = Happy Hare tip forming macro configuration variables
+gcode = 
+variable_ramming_volume = 0
+variable_ramming_volume_standalone = 0
+variable_toolchange_temp = 0
+variable_toolchange_fan_assist = False
+variable_toolchange_fan_name = 'fan_generic cooling_fan'
+variable_toolchange_fan_speed = 50
+variable_unloading_speed_start = 80
+variable_unloading_speed = 18
+variable_cooling_tube_position = 20
+variable_cooling_tube_length = 22
+variable_initial_cooling_speed = 10
+variable_final_cooling_speed = 50
+variable_cooling_moves = 4
+variable_use_skinnydip = False
+variable_skinnydip_distance = 30
+variable_dip_insertion_speed = 30
+variable_dip_extraction_speed = 70
+variable_melt_zone_pause = 0
+variable_cooling_zone_pause = 0
+variable_use_fast_skinnydip = False
+variable_parking_distance = 0
+variable_extruder_eject_speed = 25
+
+[gcode_macro _MMU_PURGE_VARS]
+description = Happy Hare reference purging macro configuration variables
+gcode = 
+variable_extruder_purge_speed = 2
+
+[gcode_macro _MMU_CLIENT_VARS]
+description = Happy Hare client macro configuration variables
+gcode = 
+variable_reset_ttg_on_cancel = False
+variable_unload_tool_on_cancel = False
+variable_user_pause_extension = ''
+variable_user_resume_extension = ''
+variable_user_cancel_extension = ''
+
+[gcode_macro T0]
+gcode = MMU_CHANGE_TOOL TOOL=0
+
+[gcode_macro T1]
+gcode = MMU_CHANGE_TOOL TOOL=1
+
+[gcode_macro T2]
+gcode = MMU_CHANGE_TOOL TOOL=2
+
+[gcode_macro T3]
+gcode = MMU_CHANGE_TOOL TOOL=3
+
+[mmu]
+happy_hare_version = 3.41
+gear_max_velocity = 300
+gear_max_accel = 1500
+log_level = 1
+log_file_level = 2
+log_statistics = 1
+log_visual = 1
+log_startup_status = 1
+log_m117_messages = 1
+gear_from_spool_speed = 80
+gear_from_spool_accel = 100
+gear_from_buffer_speed = 150
+gear_from_buffer_accel = 400
+gear_unload_speed = 80
+gear_unload_accel = 100
+gear_short_move_speed = 80
+gear_short_move_accel = 600
+gear_short_move_threshold = 70
+gear_homing_speed = 50
+extruder_load_speed = 16
+extruder_unload_speed = 16
+extruder_sync_load_speed = 18
+extruder_sync_unload_speed = 18
+extruder_homing_speed = 18
+macro_toolhead_max_accel = 0
+macro_toolhead_min_cruise_ratio = 0.5
+gate_homing_endstop = mmu_gate
+gate_homing_max = 70
+gate_preload_homing_max = 70
+gate_preload_parking_distance = -10
+gate_unload_buffer = 50
+gate_parking_distance = 100
+gate_endstop_to_encoder = 10
+gate_autoload = 1
+gate_final_eject_distance = 0
+bowden_homing_max = 2000
+bowden_apply_correction = 0
+bowden_allowable_load_delta = 20.0
+bowden_pre_unload_test = 1
+bowden_pre_unload_error_tolerance = 50
+extruder_homing_max = 80
+extruder_homing_endstop = none
+extruder_homing_buffer = 25
+extruder_collision_homing_current = 30
+extruder_force_homing = 0
+toolhead_homing_max = 40
+toolhead_extruder_to_nozzle = 75
+toolhead_sensor_to_nozzle = 62
+toolhead_entry_to_extruder = 22
+toolhead_residual_filament = 0
+toolhead_ooze_reduction = 0
+toolhead_unload_safety_margin = 10
+toolhead_post_load_tighten = 60
+toolhead_post_load_tension_adjust = 1
+toolhead_entry_tension_test = 1
+toolhead_move_error_tolerance = 60
+force_form_tip_standalone = 1
+form_tip_macro = _MMU_FORM_TIP
+extruder_form_tip_current = 100
+slicer_tip_park_pos = 0
+force_purge_standalone = 0
+purge_macro = _MMU_PURGE
+extruder_purge_current = 100
+sync_gear_current = 70
+sync_feedback_enabled = 0
+sync_feedback_buffer_range = 6
+sync_feedback_buffer_maxrange = 12
+sync_multiplier_high = 1.05
+sync_multiplier_low = 0.95
+espooler_min_distance = 30
+espooler_max_stepper_speed = 300
+espooler_min_stepper_speed = 0
+espooler_speed_exponent = 0.5
+espooler_assist_reduced_speed = 50
+espooler_printing_power = 0
+espooler_operations = rewind, assist, print
+espooler_assist_extruder_move_length = 100
+espooler_assist_burst_power = 100
+espooler_assist_burst_duration = 0.4
+espooler_assist_burst_trigger = 0
+espooler_assist_burst_trigger_max = 3
+enable_clog_detection = 0
+enable_endless_spool = 1
+endless_spool_on_load = 0
+endless_spool_eject_gate = -1
+spoolman_support = off
+pending_spool_id_timeout = 20
+t_macro_color = slicer
+console_stat_columns = unload, load, post_load, total
+console_stat_rows = total, total_average, job, job_average, last
+console_gate_stat = emoticon
+console_always_output_full = 1
+autocal_bowden_length = 1
+autotune_bowden_length = 1
+skip_cal_rotation_distance = 0
+autotune_rotation_distance = 0
+skip_cal_encoder = 0
+autotune_encoder = 0
+timeout_pause = 72000
+disable_heater = 600
+default_extruder_temp = 200
+extruder_temp_variance = 2
+startup_home_if_unloaded = 0
+startup_reset_ttg_map = 0
+show_error_dialog = 1
+preload_attempts = 5
+strict_filament_recovery = 0
+filament_recovery_on_pause = 1
+retry_tool_change_on_error = 0
+bypass_autoload = 1
+has_filament_buffer = 0
+encoder_move_validation = 1
+print_start_detection = 1
+extruder = extruder
+gcode_load_sequence = 0
+gcode_unload_sequence = 0
+update_trsync = 1
+canbus_comms_retries = 3
+update_bit_max_time = 1
+update_aht10_commands = 0
+pause_macro = PAUSE
+action_changed_macro = _MMU_ACTION_CHANGED
+print_state_changed_macro = _MMU_PRINT_STATE_CHANGED
+mmu_event_macro = _MMU_EVENT
+pre_unload_macro = _MMU_PRE_UNLOAD
+post_form_tip_macro = _MMU_POST_FORM_TIP
+post_unload_macro = _MMU_POST_UNLOAD
+pre_load_macro = _MMU_PRE_LOAD
+post_load_macro = _MMU_POST_LOAD
+unload_sequence_macro = _MMU_UNLOAD_SEQUENCE
+load_sequence_macro = _MMU_LOAD_SEQUENCE
+
+[gcode_macro _MMU_PURGE]
+description = Simple reference filament purge
+gcode = 
+	
+	{% set sequence_vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set retracted_length = park_vars.retracted_length %}
+	{% set retract_speed = sequence_vars.retract_speed|int %}
+	{% set unretract_speed = sequence_vars.unretract_speed|int %}
+	
+	
+	{% set toolchange_purge_volume = printer.mmu.toolchange_purge_volume|default(0)|float %}
+	{% set extruder_filament_remaining = printer.mmu.extruder_filament_remaining|default(0)|float %}
+	
+	
+	
+	{% set pv = printer.mmu.slicer_tool_map.purge_volumes %}
+	
+	
+	{% set filament_diameter = printer.configfile.config.extruder.filament_diameter|float %}
+	{% set filament_cross_section = (filament_diameter / 2) ** 2 * 3.1415 %}
+	{% set purge_len = (toolchange_purge_volume / filament_cross_section) + extruder_filament_remaining %}
+	{% set segment_len = 2.0 %}
+	
+	
+	{% if retracted_length > 0 %}
+	MMU_LOG MSG="Un-retracting {retracted_length}mm"
+	M83
+	G1 E{retracted_length} F{unretract_speed|abs * 60}
+	{% endif %}
+	
+	MMU_LOG MSG="Purging {purge_len | round(1)}mm of filament"
+	
+	
+	{% set num_segments = (purge_len // segment_len) | int %}
+	{% for _ in range(num_segments) %}
+	__MMU_PURGE_SEGMENT LENGTH={segment_len}
+	{% endfor %}
+	__MMU_PURGE_SEGMENT LENGTH={purge_len % segment_len}
+	
+	
+	{% if retracted_length > 0 %}
+	MMU_LOG MSG="Retracting {retracted_length}mm"
+	M83
+	G1 E-{retracted_length} F{retract_speed|abs * 60}
+	{% endif %}
+	
+	MMU_LOG MSG="Purging complete"
+
+[gcode_macro __MMU_PURGE_SEGMENT]
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_PURGE_VARS'] %}
+	{% set extruder_purge_speed = vars['extruder_purge_speed']|float %}
+	{% set length = params.LENGTH|float %}
+	{% set clog_runout_detected = printer.mmu.clog_runout_detected|default(false)|lower == 'true' %}
+	
+	{% if not clog_runout_detected %}
+	G1 E{length} F{extruder_purge_speed * 60}
+	{% endif %}
+
+[gcode_macro _MMU_PARK]
+description = Park toolhead safely away from print
+variable_saved_xyz = 0, 0, 0
+variable_saved_pos = False
+variable_park_operation = ''
+variable_next_xy = 0, 0
+variable_next_pos = False
+variable_min_lifted_z = 0
+variable_toolchange_z = -1
+variable_retracted_length = 0
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set operation = params.OPERATION|default(printer.mmu.operation)|string|lower %}
+	{% set is_printing = printer.mmu.print_state in ["started", "printing"] and not printer.pause_resume.is_paused %}
+	{% set force_park = params.FORCE_PARK|default(0)|int == 1 %}
+	{% set force_park_x = params.X|default(-999)|float %}
+	{% set force_park_y = params.Y|default(-999)|float %}
+	{% set enable_park_printing = (vars.enable_park_printing|default("toolchange,runout,pause,cancel")|string|lower).split(",") %}
+	{% set enable_park_standalone = (vars.enable_park_standalone|default("toolchange,load,unload,pause,cancel")|string|lower).split(",") %}
+	{% set enable_park_disabled = (vars.enable_park_disabled|default("pause,cancel")|string|lower).split(",") %}
+	{% set nx,ny = next_xy|map('float') %}
+	{% set pos = printer.gcode_move.gcode_position %}
+	{% if force_park %}
+	{% set operation = 'force_park' %}
+	{% set x = force_park_x %}
+	{% set y = force_park_y %}
+	{% set park_z_hop = params.Z_HOP|default(0)|float %}
+	{% set z_hop_ramp = params.RAMP|default(0)|float %}
+	{% set retract = 0 %}
+	{% elif operation in ['toolchange','load','unload'] %}
+	{% set x, y, park_z_hop, z_hop_ramp, retract = vars.park_toolchange|default([-999,-999,0,0,0])|map('float') %}
+	{% elif operation in ['runout'] %}
+	{% set x, y, park_z_hop, z_hop_ramp, retract = vars.park_runout|default([-999,-999,0,0,0])|map('float') %}
+	{% elif operation in ['pause'] %}
+	{% set x, y, park_z_hop, z_hop_ramp, retract = vars.park_pause|default([-999,-999,0,0,0])|map('float') %}
+	{% elif operation in ['cancel'] %}
+	{% set x, y, park_z_hop, z_hop_ramp, retract = vars.park_cancel|default([-999,-999,0,0,0])|map('float') %}
+	{% elif operation in ['complete'] %}
+	{% set x, y, park_z_hop, z_hop_ramp, retract = vars.park_complete|default([-999,-999,0,0,0])|map('float') %}
+	{% else %}
+	{% set x = -999 %}
+	{% set y = -999 %}
+	{% set park_z_hop = 0 %}
+	{% set z_hop_ramp = 0 %}
+	{% set retract = 0 %}
+	{% endif %}
+	{% set park_z_hop = park_z_hop|abs %}
+	{% set z_hop_ramp = z_hop_ramp|abs %}
+	{% set min_toolchange_z = vars.min_toolchange_z|default(1)|float|abs %}
+	{% if x == -999 and y == -999 and park_z_hop == 0 %}
+	{% set min_toolchange_z = 0 %}
+	{% endif %}
+	{% set park_travel_speed = vars.park_travel_speed|default(200)|float * 60 %}
+	{% set park_lift_speed = vars.park_lift_speed|default(15)|float * 60 %}
+	{% set pos = printer.gcode_move.gcode_position %}
+	{% set origin = printer.gcode_move.homing_origin %}
+	{% set max = printer.toolhead.axis_maximum %}
+	
+	
+	{% set orig_x = pos.x %}
+	{% set orig_y = pos.y %}
+	{% set cx = (max.x - origin.x) / 2.0 %}
+	{% set cy = (max.y - origin.y) / 2.0 %}
+	{% if pos.x == cx and pos.y == cy %}
+	{% set target_x = 0 %}
+	{% set target_y = 0 %}
+	{% else %}
+	{% set target_x = cx %}
+	{% set target_y = cy %}
+	{% endif %}
+	{% set dx = target_x - pos.x %}
+	{% set dy = target_y - pos.y %}
+	{% set length = (dx * dx + dy * dy) ** 0.5 %}
+	{% set z_hop_x = pos.x + z_hop_ramp * dx / length %}
+	{% set z_hop_y = pos.y + z_hop_ramp * dy / length %}
+	
+	{% set starting_z = saved_xyz[2] if saved_pos else pos.z %}
+	{% set z_hop_floor = [starting_z, min_lifted_z]|max %}
+	{% set toolchange_z = [[z_hop_floor + park_z_hop, max.z - origin.z]|min, min_toolchange_z, toolchange_z]|max %}
+	
+	{% set should_park = force_park or (
+	operation in (
+	enable_park_disabled if not printer.mmu.enabled else
+	(enable_park_printing if is_printing else enable_park_standalone)
+	) and operation != park_operation
+	) %}
+	{% set should_ramp = (
+	should_park and pos.z == starting_z and
+	park_z_hop > 0 and z_hop_ramp > 0 and
+	operation not in ['load'] and is_printing
+	) %}
+	{% set should_retract = (
+	should_park and
+	retracted_length == 0 and retract > 0 and
+	operation not in ['load']
+	) %}
+	
+	{% if should_park %}
+	{% if should_retract %}
+	_MMU_RETRACT LENGTH={retract}
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=toolchange_z VALUE={toolchange_z}
+	{% set lift=" with ramping lift" if should_ramp else "" %}
+	MMU_LOG MSG="Parking toolhead at (x:{x|round(1) if x != -999 else "n/a"}, y:{y|round(1) if y != -999 else "n/a"}, z:{toolchange_z|round(1)}){lift} for {operation} operation"
+	{% if 'xy' not in printer.toolhead.homed_axes %}
+	MMU_LOG MSG="Cannot park because XY not homed"
+	{% else %}
+	G90
+	{% if 'z' not in printer.toolhead.homed_axes %}
+	MMU_LOG MSG="Skipping z_hop move because Z not homed"
+	{% else %}
+	{% if should_ramp %}
+	G1 X{z_hop_x} Y{z_hop_y} Z{toolchange_z} F{park_travel_speed}
+	G1 X{orig_x} Y{orig_y} Z{toolchange_z} F{park_travel_speed}
+	{% else %}
+	G1 Z{toolchange_z} F{park_lift_speed}
+	{% endif %}
+	{% endif %}
+	{% if vars.user_park_move_macro %}
+	{vars.user_park_move_macro} X={x} Y={y} F={park_travel_speed}
+	{% elif x != -999 and y != -999 %}
+	G1 X{x} Y{y} F{park_travel_speed}
+	{% elif x != -999 and y == -999 %}
+	G1 X{x} F{park_travel_speed}
+	{% elif x == -999 and y != -999 %}
+	G1 Y{y} F{park_travel_speed}
+	{% endif %}
+	{% endif %}
+	{% if not force_park %}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=park_operation VALUE=\"{operation}\"
+	{% endif %}
+	{% endif %}
+
+[gcode_macro _MMU_SAVE_POSITION]
+description = Record to toolhead position for return later
+gcode = 
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set pos = printer.gcode_move.gcode_position %}
+	{% set axis_minimum = printer.toolhead.axis_minimum %}
+	{% set axis_maximum = printer.toolhead.axis_maximum %}
+	{% set x = [axis_minimum.x, [axis_maximum.x, pos.x]|min]|max %}
+	{% set y = [axis_minimum.y, [axis_maximum.y, pos.y]|min]|max %}
+	
+	{% if not park_vars.saved_pos and 'xyz' in printer.toolhead.homed_axes %}
+	{% if x != pos.x or y != pos.y %}
+	MMU_LOG MSG="Warning: Klipper reported out of range gcode position (x:{pos.x}, y:{pos.y})! Adjusted to (x:{x}, y:{y}) to prevent move failure" ERROR=1
+	{% endif %}
+	MMU_LOG MSG="Saving toolhead position (x:{x|round(1)}, y:{y|round(1)}, z:{pos.z|round(1)})"
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=saved_xyz VALUE="{x}, {y}, {pos.z}"
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=saved_pos VALUE={True}
+	{% endif %}
+
+[gcode_macro _MMU_RESTORE_POSITION]
+description = Restore saved toolhead position
+gcode = 
+	{% set skip_restore = params.SKIP_RESTORE|default(0)|int %}
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set x,y,z = park_vars.saved_xyz|map('float') %}
+	{% set nx,ny = park_vars.next_xy|map('float') %}
+	{% set park_travel_speed = vars.park_travel_speed|default(200)|float * 60 %}
+	{% set park_lift_speed = vars.park_lift_speed|default(15)|float * 60 %}
+	{% set restore_xy_pos = vars.restore_xy_pos|default('last') %}
+	{% set is_printing = printer.mmu.print_state in ["started", "printing"] and not printer.pause_resume.is_paused %}
+	
+	{% set should_unretract = (
+	park_vars.retracted_length and
+	park_vars.park_operation not in ['unload', 'cancel', 'complete']
+	) %}
+	{% set should_restore_nextxy = (
+	park_vars.next_pos and
+	restore_xy_pos == 'next' and
+	park_vars.park_operation == 'toolchange'
+	) %}
+	{% set should_restore_xy = (
+	park_vars.saved_pos and
+	(restore_xy_pos != 'none' or park_vars.park_operation != 'toolchange')
+	) %}
+	
+	{% if not skip_restore %}
+	G90
+	{% if park_vars.toolchange_z > 0 and park_vars.saved_pos and 'z' in printer.toolhead.homed_axes %}
+	G1 Z{park_vars.toolchange_z} F{park_lift_speed}
+	{% endif %}
+	{% if should_restore_nextxy %}
+	{% if vars.user_park_move_macro %}
+	MMU_LOG MSG="Restoring toolhead position to next pos using {vars.user_park_move_macro} RESTORE=1 (x:{nx|round(1)}, y:{ny|round(1)})"
+	{vars.user_park_move_macro} RESTORE=1 X={nx} Y={ny} F={park_travel_speed}
+	{% else  %}
+	MMU_LOG MSG="Restoring toolhead position to next pos: (x:{nx|round(1)}, y:{ny|round(1)}, z:{z|round(1)})"
+	G1 X{nx} Y{ny} F{park_travel_speed}
+	{% endif %}
+	{% elif should_restore_xy %}
+	{% if vars.user_park_move_macro %}
+	MMU_LOG MSG="Restoring toolhead position to last pos using {vars.user_park_move_macro} RESTORE=1 (x:{x|round(1)}, y:{y|round(1)})"
+	{vars.user_park_move_macro} RESTORE=1 X={x} Y={y} F={park_travel_speed}
+	{% else %}
+	MMU_LOG MSG="Restoring toolhead position to last pos: (x:{x|round(1)}, y:{y|round(1)}, z:{z|round(1)})"
+	G1 X{x} Y{y} F{park_travel_speed}
+	{% endif %}
+	{% elif park_vars.saved_pos %}
+	MMU_LOG MSG="Restoring toolhead position to: (z:{z|round(1)})"
+	{% endif %}
+	{% if park_vars.saved_pos and 'z' in printer.toolhead.homed_axes %}
+	G1 Z{z} F{park_lift_speed}
+	{% endif %}
+	{% else %}
+	MMU_LOG MSG="Skipping restore of toolhead XYZ position"
+	{% endif %}
+	
+	{% if should_unretract %}
+	_MMU_UNRETRACT
+	{% endif %}
+	
+	_MMU_CLEAR_POSITION
+
+[gcode_macro _MMU_RETRACT]
+description = Helper to retract filament
+gcode = 
+	{% set sequence_vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set retracted_length = park_vars.retracted_length %}
+	{% set length = params.LENGTH|default(0)|float|abs %}
+	{% set speed = sequence_vars.retract_speed|int %}
+	{% set length = [length - retracted_length, 0] | max %}
+	
+	{% if printer.extruder.can_extrude %}
+	{% if length > 0 %}
+	MMU_LOG MSG="Retracting {length}mm"
+	M83
+	G1 E-{length} F{speed|abs * 60}
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=retracted_length VALUE={length}
+	{% else %}
+	MMU_LOG MSG="Extruder is not hot enough to retract" DEBUG=1
+	{% endif %}
+
+[gcode_macro _MMU_UNRETRACT]
+description = Helper to extruder filament to undo retract
+gcode = 
+	{% set sequence_vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set length = park_vars.retracted_length %}
+	{% set speed = sequence_vars.unretract_speed|int %}
+	
+	{% if printer.extruder.can_extrude %}
+	{% if length > 0 %}
+	MMU_LOG MSG="Un-retracting {length}mm"
+	M83
+	G1 E{length} F{speed|abs * 60}
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=retracted_length VALUE=0
+	{% else %}
+	MMU_LOG MSG="Extruder is not hot enough to un-retract" DEBUG=1
+	{% endif %}
+
+[gcode_macro _MMU_CLEAR_POSITION]
+description = Clear previously recorded toolhead position
+gcode = 
+	{% set reset = params.RESET|default(0)|int %}
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=saved_pos VALUE={False}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=next_pos VALUE={False}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=toolchange_z VALUE=-1
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=retracted_length VALUE=0
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=park_operation VALUE=\"\"
+	{% if reset %}
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=min_lifted_z VALUE=0
+	{% endif %}
+	MMU_LOG MSG="Clearing saved toolhead position{' and rising toolchange floor' if reset else ''}" DEBUG=1
+
+[gcode_macro _MMU_AUTO_HOME]
+description = Convenience auto homing primarily for testing
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set auto_home = vars.auto_home|default(true)|lower == 'true' %}
+	
+	{% if auto_home and 'xyz' not in printer.toolhead.homed_axes %}
+	MMU_LOG MSG="Automatically homing XYZ before parking toolhead"
+	G28
+	{% endif %}
+
+[gcode_macro MMU_UPDATE_HEIGHT]
+description = Record maximum toolhead height for z-hop base (call on layer change for sequential printing)
+gcode = 
+	{% set height = params.HEIGHT|default(0)|float %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set max_z = [park_vars.min_lifted_z, printer.gcode_move.gcode_position.z, height]|max %}
+	
+	{% if max_z > park_vars.min_lifted_z %}
+	MMU_LOG MSG="Setting rising toolchange floor to {max_z}" DEBUG=1
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=min_lifted_z VALUE={max_z}
+
+[gcode_macro _MMU_PRE_UNLOAD]
+description = Optional pre unload routine for filament change
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set x, y, z_hop = vars.pre_unload_position|default([-999,-999,0])|map('float') %}
+	
+	{% if x != -999 or y != -999 or z_hop > 0 %}
+	_MMU_PARK FORCE_PARK=1 X={x} Y={y} Z_HOP={z_hop}
+	{% endif %}
+	{vars.user_pre_unload_extension|default("")}
+
+[gcode_macro _MMU_POST_FORM_TIP]
+description = Optional post tip forming/cutting routing
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set x, y, z_hop = vars.post_form_tip_position|default([-999,-999,0])|map('float') %}
+	
+	{% if x != -999 or y != -999 or z_hop > 0 %}
+	_MMU_PARK FORCE_PARK=1 X={x} Y={y} Z_HOP={z_hop}
+	{% endif %}
+	{vars.user_post_form_tip_extension|default("")}
+
+[gcode_macro _MMU_POST_UNLOAD]
+description = Optional post unload routine for filament change
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	
+	
+	
+	
+	{vars.user_post_unload_extension|default("")}
+
+[gcode_macro _MMU_PRE_LOAD]
+description = Optional pre load routine for filament change
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set x, y, z_hop = vars.pre_load_position|default([-999,-999,0])|map('float') %}
+	
+	{% if x != -999 or y != -999 or z_hop > 0 %}
+	_MMU_PARK FORCE_PARK=1 X={x} Y={y} Z_HOP={z_hop}
+	{% endif %}
+	{vars.user_pre_load_extension|default("")}
+
+[gcode_macro _MMU_POST_LOAD]
+description = Optional post load routine for filament change
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set timelapse = vars.timelapse|default(false)|lower == 'true' %}
+	
+	{% if timelapse %}
+	TIMELAPSE_TAKE_FRAME
+	{% endif %}
+	
+	
+	
+	{vars.user_post_load_extension|default("")}
+
+[gcode_macro _MMU_ERROR]
+description = Called when an MMU error occurs
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{vars.user_mmu_error_extension|default("")}
+
+[gcode_macro _MMU_LOAD_SEQUENCE]
+description = Called when MMU is asked to load filament
+gcode = 
+	{% set filament_pos = params.FILAMENT_POS|float %}
+	{% set length = params.LENGTH|float %}
+	{% set full = params.FULL|int %}
+	{% set home_extruder = params.HOME_EXTRUDER|int %}
+	{% set skip_extruder = params.SKIP_EXTRUDER|int %}
+	{% set extruder_only = params.EXTRUDER_ONLY|int %}
+	
+	{% if extruder_only %}
+	_MMU_STEP_LOAD_TOOLHEAD EXTRUDER_ONLY=1
+	
+	{% elif filament_pos >= 7 %}
+	{action_raise_error("Can't load - already in extruder!")}
+	
+	{% else %}
+	{% if filament_pos <= 0 %}
+	_MMU_STEP_LOAD_GATE
+	{% endif %}
+	
+	{% if filament_pos < 4 %}
+	_MMU_STEP_LOAD_BOWDEN LENGTH={length}
+	{% endif %}
+	
+	{% if filament_pos < 6 and home_extruder %}
+	_MMU_STEP_HOME_EXTRUDER
+	{% endif %}
+	
+	{% if not skip_extruder %}
+	_MMU_STEP_LOAD_TOOLHEAD
+	{% endif %}
+	
+	{% endif %}
+
+[gcode_macro _MMU_UNLOAD_SEQUENCE]
+description = Called when MMU is asked to unload filament
+gcode = 
+	{% set filament_pos = params.FILAMENT_POS|float %}
+	{% set length = params.LENGTH|float %}
+	{% set extruder_only = params.EXTRUDER_ONLY|int %}
+	{% set park_pos = params.PARK_POS|float %}
+	
+	{% if extruder_only %}
+	{% if filament_pos >= 7 %}
+	_MMU_STEP_UNLOAD_TOOLHEAD EXTRUDER_ONLY=1 PARK_POS={park_pos}
+	{% else %}
+	{action_raise_error("Can't unload extruder - already unloaded!")}
+	{% endif %}
+	
+	{% elif filament_pos == 0 %}
+	{action_raise_error("Can't unload - already unloaded!")}
+	
+	{% else %}
+	{% if filament_pos >= 7 %}
+	
+	_MMU_STEP_UNLOAD_TOOLHEAD PARK_POS={park_pos}
+	{% endif %}
+	
+	{% if filament_pos >= 4 %}
+	
+	_MMU_STEP_UNLOAD_BOWDEN FULL=1
+	_MMU_STEP_UNLOAD_GATE
+	
+	{% elif filament_pos >= 2 %}
+	
+	_MMU_STEP_UNLOAD_GATE FULL=1
+	{% endif %}
+	
+	{% endif %}
+
+[gcode_macro MMU_START_SETUP]
+description = Called when starting print to setup MMU
+gcode = 
+	{% set initial_tool = params.INITIAL_TOOL|default(0)|int %}
+	{% set total_toolchanges = params.TOTAL_TOOLCHANGES|default(0)|int %}
+	{% set ttg_map = printer.mmu.ttg_map %}
+	{% set gate_fil_names = printer.mmu.gate_filament_name %}
+	{% set gate_colors = printer.mmu.gate_color %}
+	{% set num_gates = ttg_map|length %}
+	{% set referenced_tools = (params.REFERENCED_TOOLS|default("!referenced_tools!")|string).split(",")
+	if (params.REFERENCED_TOOLS and params.REFERENCED_TOOLS != "")
+	else [] %}
+	{% set tool_colors = (params.TOOL_COLORS|default("")|string).split(",")
+	if (params.TOOL_COLORS and params.TOOL_COLORS != "!colors!" and params.TOOL_COLORS != "")
+	else ['000000'] * num_gates %}
+	{% set tool_temps = (params.TOOL_TEMPS|default("")|string).split(",")
+	if (params.TOOL_TEMPS and params.TOOL_TEMPS != "!temperatures!" and params.TOOL_TEMPS != "")
+	else ['0'] * num_gates %}
+	{% set tool_materials = (params.TOOL_MATERIALS|default("")|string).split(",")
+	if (params.TOOL_MATERIALS and params.TOOL_MATERIALS != "!materials!" and params.TOOL_MATERIALS != "")
+	else ['unknown'] * num_gates %}
+	{% set filament_names = (params.FILAMENT_NAMES|default("")|string).split(",")
+	if (params.FILAMENT_NAMES and params.FILAMENT_NAMES != "!filament_names!" and params.FILAMENT_NAMES != "")
+	else [''] * num_gates %}
+	{% set purge_volumes = (params.PURGE_VOLUMES|default("")|string)
+	if (params.PURGE_VOLUMES and params.PURGE_VOLUMES != "!purge_volumes!" and params.PURGE_VOLUMES != "")
+	else "" %}
+	
+	{% set vars = printer['gcode_macro _MMU_SOFTWARE_VARS'] %}
+	{% set home_mmu = vars.home_mmu|lower == 'true' %}
+	
+	{% set filament_loaded = printer.mmu.filament_pos == 10 %}
+	{% set using_bypass = printer.mmu.tool == -2 %}
+	{% set num_colors = referenced_tools|length %}
+	
+	{% if printer.mmu.enabled %}
+	
+	
+	MMU_PRINT_START
+	
+	
+	{% if not vars.user_pre_initialize_extension == "" %}
+	{vars.user_pre_initialize_extension}
+	{% endif %}
+	
+	
+	{% if referenced_tools == ['!referenced_tools!'] %}
+	MMU_LOG MSG="Happy Hare gcode pre-processor is probably disabled or not setup correctly"
+	{% set referenced_tools = [] %}
+	{% set num_colors = -1 %}
+	{% elif referenced_tools == [] %}
+	{% set num_colors = 1 %}
+	{% endif %}
+	
+	
+	{% set num_slicer_tools = tool_colors|length %}
+	{% if not using_bypass %}
+	{% if tool_colors|length != tool_temps|length or tool_colors|length != tool_materials|length or tool_colors|length != filament_names|length %}
+	MMU_LOG MSG="Warning: Slicer defined extruder attributes have different lengths. Possibly an issue with parsing slicer information or missing parameters to MMU_START_SETUP"
+	MMU_LOG MSG="  TOOL_COLORS={tool_colors}"
+	MMU_LOG MSG="  TOOL_TEMPS={tool_temps}"
+	MMU_LOG MSG="  TOOL_MATERIALS={tool_materials}"
+	MMU_LOG MSG="  FILAMENT_NAMES={filament_names}"
+	{% endif %}
+	{% if tool_colors|length != num_gates or tool_temps|length != num_gates or tool_materials|length != num_gates or filament_names|length != num_gates %}
+	{% if vars.automap_strategy != 'none' %}
+	MMU_LOG MSG="Warning: Looks like slicer is setup with {num_slicer_tools} extruders but your MMU has {num_gates} gates! Probably using auto-map feature."
+	{% else %}
+	MMU_LOG MSG="Warning: Looks like slicer is setup with {num_slicer_tools} extruders but your MMU has {num_gates} gates! These should match but will attempt to continue"
+	{% endif %}
+	{% endif %}
+	{% endif %}
+	
+	
+	MMU_SLICER_TOOL_MAP RESET=1 PURGE_VOLUMES={purge_volumes} NUM_SLICER_TOOLS={num_slicer_tools} INITIAL_TOOL={initial_tool} TOTAL_TOOLCHANGES={total_toolchanges}
+	{% if using_bypass %}
+	MMU_SLICER_TOOL_MAP SKIP_AUTOMAP=1
+	{% endif %}
+	{% for t in range(num_slicer_tools) %}
+	MMU_SLICER_TOOL_MAP TOOL={t} TEMP={tool_temps[t]} MATERIAL='{tool_materials[t]}' COLOR={tool_colors[t]} NAME='{filament_names[t]}' {"USED=0" if t|string not in referenced_tools and t != initial_tool else ""} QUIET=1 AUTOMAP={vars.automap_strategy}
+	{% endfor %}
+	
+	
+	{% set custom_msg = [] %}
+	{% set m = [] %}
+	{% for tool in referenced_tools %}
+	{% set _ = m.append("T" + tool|string + " (Gate" + ttg_map[tool|int]|string + ")") %}
+	{% endfor %}
+	{% set line = "Initial Tool: T%s" % initial_tool %}
+	{% set _ = m.append(line) %}
+	{% set _ = custom_msg.append("Print requires tools: %s" % ", ".join(m)) %}
+	{% set _ = custom_msg.append("Manually ensure that T" + initial_tool|string + " is loaded and all other tools available before resuming print") %}
+	
+	
+	{% if num_colors > 1 %}
+	MMU_SLICER_TOOL_MAP SPARSE_PURGE_MAP=1 NUM_SLICER_TOOLS={num_slicer_tools}
+	{% else %}
+	MMU_SLICER_TOOL_MAP
+	{% endif %}
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_ERROR_DIALOG VARIABLE=show_abort VALUE={True}
+	{% if using_bypass and filament_loaded %}
+	MMU_LOG MSG="MMU Bypass selected and loaded"
+	{% if num_colors > 1 %}
+	SET_GCODE_VARIABLE MACRO=_MMU_ERROR_DIALOG VARIABLE=custom_msg VALUE="{custom_msg}"
+	MMU_PAUSE MSG="Bypass selected for multi-color print"
+	{% endif %}
+	{% else %}
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_ERROR_DIALOG VARIABLE=custom_msg VALUE="{custom_msg}"
+	{% if home_mmu %}
+	{% if not filament_loaded %}
+	MMU_HOME TOOL={initial_tool}
+	{% else %}
+	MMU_LOG MSG="Skipping homing MMU because filament is already loaded"
+	{% endif %}
+	{% endif %}
+	{% endif %}
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_setup_run VALUE={True}
+
+[gcode_macro MMU_START_CHECK]
+description = Helper macro. Can be called to perform pre-start checks on MMU based on slicer requirements
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SOFTWARE_VARS'] %}
+	{% set check_gates = vars.check_gates|lower == 'true' %}
+	{% set using_bypass = printer.mmu.tool == -2 %}
+	
+	{% if printer.mmu.enabled %}
+	{% set slicer_tool_map = printer.mmu.slicer_tool_map %}
+	{% set initial_tool = slicer_tool_map.initial_tool %}
+	{% set tools = slicer_tool_map.referenced_tools %}
+	{% if not using_bypass %}
+	
+	
+	{% if check_gates and tools|length > 0 %}
+	
+	MMU_LOG MSG="Checking all required gates have filament loaded..."
+	{% if not printer.mmu.is_homed %}
+	MMU_HOME
+	{% endif %}
+	MMU_CHECK_GATE TOOLS={tools|join(",")}
+	{% endif %}
+	{% endif %}
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_check_run VALUE={True}
+
+[gcode_macro MMU_START_LOAD_INITIAL_TOOL]
+description = Helper to load initial tool if not paused
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SOFTWARE_VARS'] %}
+	{% set load_initial_tool = vars.load_initial_tool|lower == 'true' %}
+	{% set using_bypass = printer.mmu.tool == -2 %}
+	{% set filament_loaded = printer.mmu.filament_pos == 10 %}
+	{% set slicer_tool_map = printer.mmu.slicer_tool_map %}
+	{% set initial_tool = slicer_tool_map.initial_tool %}
+	{% set tools = slicer_tool_map.referenced_tools %}
+	
+	{% if printer.mmu.enabled %}
+	{% if not using_bypass and tools|length > 0 %}
+	{% if load_initial_tool and (initial_tool is not none and initial_tool >= 0) %}
+	MMU_LOG MSG="Loading initial tool T{initial_tool}..."
+	MMU_CHANGE_TOOL STANDALONE=1 RESTORE=0 TOOL={initial_tool}
+	{% endif %}
+	{% elif not filament_loaded %}
+	MMU_PAUSE MSG="Load bypass or initial tool before resuming print"
+	{% else %}
+	MMU_LOG MSG="Using bypass"
+	{% endif %}
+	{% endif %}
+	
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_ERROR_DIALOG VARIABLE=custom_msg VALUE='""'
+	SET_GCODE_VARIABLE MACRO=_MMU_ERROR_DIALOG VARIABLE=show_abort VALUE={False}
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_load_initial_tool_run VALUE={True}
+
+[gcode_macro MMU_END]
+description = Called when ending print to finalize MMU
+gcode = 
+	{% set unload = params.UNLOAD|default(0)|int %}
+	{% set vars = printer['gcode_macro _MMU_SOFTWARE_VARS'] %}
+	{% set unload_tool = vars.unload_tool|lower == 'true' %}
+	{% set reset_ttg = vars.reset_ttg|lower == 'true' %}
+	{% set dump_stats = vars.dump_stats|lower == 'true' %}
+	{% set slicer_tool_map = printer.mmu.slicer_tool_map %}
+	{% set tools = slicer_tool_map.referenced_tools %}
+	{% set using_bypass = printer.mmu.tool == -2 %}
+	
+	{% if printer.mmu.enabled %}
+	{% if not vars.user_print_end_extension == "" %}
+	{vars.user_print_end_extension}
+	{% endif %}
+	
+	{% if unload or unload_tool %}
+	MMU_LOG MSG="Unloading filament on print end"
+	MMU_UNLOAD RESTORE=0
+	{% endif %}
+	
+	{% if reset_ttg %}
+	MMU_TTG_MAP RESET=1 QUIET=1
+	{% endif %}
+	
+	{% if dump_stats and not using_bypass and tools|length > 0 %}
+	MMU_STATS
+	{% endif %}
+	
+	
+	MMU_PRINT_END STATE=complete
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_end_run VALUE={True}
+
+[gcode_macro MMU_COLD_PULL]
+description = Guide you through the process of cleaning your extruder with a cold pull
+gcode = 
+	{% set material = params.MATERIAL|default("pla")|string|upper %}
+	{% set materials = {
+	'NYLON': {'hot_temp': 260, 'cold_temp': 50, 'pull_temp': 120, 'min_extrude_temp': 190},
+	'PLA':   {'hot_temp': 250, 'cold_temp': 45, 'pull_temp': 100, 'min_extrude_temp': 160},
+	'ABS':   {'hot_temp': 255, 'cold_temp': 50, 'pull_temp': 120, 'min_extrude_temp': 190},
+	'PETG':  {'hot_temp': 250, 'cold_temp': 45, 'pull_temp': 100, 'min_extrude_temp': 180}
+	} %}
+	{% if material not in materials %}
+	{action_raise_error("Unknown material. Valid types are: Nylon, ABS, PLA, PETG")}
+	{% endif %}
+	
+	
+	{% set hot_temp = params.HOT_TEMP|default('')|int %}
+	{% set cold_temp = params.COLD_TEMP|default('')|int %}
+	{% set pull_temp = params.PULL_TEMP|default('')|int %}
+	{% set min_extrude_temp = params.MIN_EXTRUDE_TEMP|default('')|int %}
+	{% set hot_temp = (hot_temp if hot_temp > 0 else materials.get(material).hot_temp)|int %}
+	{% set cold_temp = (cold_temp if cold_temp > 0 else materials.get(material).cold_temp)|int %}
+	{% set pull_temp = (pull_temp if pull_temp > 0 else materials.get(material).pull_temp)|int %}
+	{% set min_extrude_temp = (min_extrude_temp if min_extrude_temp > 0 else materials.get(material).min_extrude_temp)|int %}
+	
+	{% set pull_speed = params.PULL_SPEED|default(10)|int %}
+	{% set clean_length = params.CLEAN_LENGTH|default(25)|int %}
+	{% set extrude_speed = params.EXTRUDE_SPEED|default(1.5)|float %}
+	
+	{% set ns = namespace(stuff_points=[], cool_points=[]) %}
+	
+	{% for temp in range(hot_temp + 1, cold_temp - 1, -1) %}
+	{% if temp % 10 == 0 %}
+	{% if temp > min_extrude_temp %}
+	{% set ns.stuff_points = ns.stuff_points + [temp] %}
+	{% elif temp < min_extrude_temp %}
+	{% set ns.cool_points = ns.cool_points + [temp] %}
+	{% endif %}
+	{% endif %}
+	{% endfor %}
+	
+	MMU_LOG MSG='{"Cold Pull based on %s profile (use MATERIAL= to adjust):" % material}'
+	MMU_LOG MSG='{"pull_temp=%d\u00B0C, hot_temp=%d\u00B0C, min_extruder=%d\u00B0C, cold_temp=%d\u00B0C" % (pull_temp, hot_temp, min_extrude_temp, cold_temp)}'
+	
+	MMU_LOG MSG='{"Heating extruder to %d\u00B0C..." % hot_temp}'
+	SET_HEATER_TEMPERATURE HEATER="extruder" TARGET={hot_temp}
+	TEMPERATURE_WAIT SENSOR="extruder" MINIMUM={hot_temp - 2} MAXIMUM={hot_temp + 2}
+	
+	
+	MMU_LOG MSG="Cleaning nozzle tip with {clean_length}mm of filament"
+	_MMU_STEP_MOVE MOTOR="extruder" MOVE={clean_length} SPEED={extrude_speed} ALLOW_BYPASS=1
+	
+	
+	MMU_LOG MSG="Allowing extruder to cool..."
+	SET_HEATER_TEMPERATURE HEATER="extruder" TARGET={cold_temp}
+	M106 S255
+	
+	
+	{% for temp in ns.stuff_points %}
+	TEMPERATURE_WAIT SENSOR="extruder" MAXIMUM={temp}
+	MMU_LOG MSG='{"> Stuffing nozzle at %d\u00B0C" % temp}'
+	_MMU_STEP_MOVE MOTOR="extruder" MOVE=1 SPEED={extrude_speed} ALLOW_BYPASS=1
+	{% endfor %}
+	
+	
+	MMU_LOG MSG='{"Waiting for extruder to completely cool to %d\u00B0C..." % cold_temp}'
+	{% for temp in ns.cool_points %}
+	TEMPERATURE_WAIT SENSOR="extruder" MAXIMUM={temp}
+	MMU_LOG MSG='{"> Nozzle at %d\u00B0C" % temp}'
+	{% endfor %}
+	TEMPERATURE_WAIT SENSOR="extruder" MAXIMUM={cold_temp}
+	
+	
+	M107
+	MMU_LOG MSG='{"Re-warming extruder to %d\u00B0C" % pull_temp}'
+	SET_HEATER_TEMPERATURE HEATER="extruder" TARGET={pull_temp}
+	
+	
+	TEMPERATURE_WAIT SENSOR="extruder" MINIMUM={pull_temp - 10}
+	MMU_LOG MSG="Get ready to pull..."
+	TEMPERATURE_WAIT SENSOR="extruder" MINIMUM={pull_temp}
+	MMU_LOG MSG=">>>>> PULL NOW <<<<<"
+	
+	
+	_MMU_STEP_MOVE MOTOR="extruder" MOVE=-150 SPEED={pull_speed} ALLOW_BYPASS=1
+	
+	MMU_LOG MSG="Cold pull is successful if you can see the shape of the nozzle at the filament end"
+	MMU_LOG MSG="If not, try again, perhaps with tweaked temperatures"
+	
+	
+	SET_HEATER_TEMPERATURE HEATER="extruder"
+
+[gcode_macro _MMU_ERROR_DIALOG]
+description = Helper to display pause dialog
+variable_custom_msg = ''
+variable_show_abort = False
+gcode = 
+	{% set message = params.MSG|string %}
+	{% set reason = params.REASON|string %}
+	RESPOND TYPE=command MSG="action:prompt_begin Happy Hare Error Notice"
+	RESPOND TYPE=command MSG='{"action:prompt_text %s" % message}'
+	RESPOND TYPE=command MSG='{"action:prompt_text Reason: %s" % reason}'
+	{% if not custom_msg == "" %}
+	{% for line in custom_msg %}
+	RESPOND TYPE=command MSG='{"action:prompt_text %s" % line}'
+	{% endfor %}
+	{% else %}
+	RESPOND TYPE=command MSG="action:prompt_text After fixing, call RESUME to continue printing (MMU_UNLOCK to restore temperature)"
+	{% endif %}
+	RESPOND TYPE=command MSG="action:prompt_button_group_start"
+	{% if show_abort %}
+	RESPOND TYPE=command MSG="action:prompt_button ABORT|CANCEL_PRINT|error"
+	{% endif %}
+	RESPOND TYPE=command MSG="action:prompt_button UNLOCK|MMU_UNLOCK|secondary"
+	RESPOND TYPE=command MSG="action:prompt_button RESUME|RESUME|warning"
+	RESPOND TYPE=command MSG="action:prompt_button_group_end"
+	RESPOND TYPE=command MSG="action:prompt_show"
+	{% set custom_msg = "" %}
+
+[gcode_macro _MMU_RUN_MARKERS]
+variable_mmu_start_setup_run = False
+variable_mmu_start_check_run = False
+variable_mmu_start_load_initial_tool_run = False
+variable_mmu_end_run = False
+gcode = 
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_setup_run VALUE=False
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_check_run VALUE=False
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_load_initial_tool_run VALUE=False
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_end_run VALUE=False
+
+[gcode_macro MMU__UNLOAD]
+gcode = MMU_UNLOAD
+
+[gcode_macro MMU__EJECT]
+gcode = MMU_EJECT
+
+[gcode_macro MMU__HOME]
+gcode = 
+	{% set tool = params.TOOL|default(0)|int %}
+	{% set force_unload = params.FORCE_UNLOAD|default(0)|int %}
+	MMU_HOME TOOL={tool} FORCE_UNLOAD={force_unload}
+
+[gcode_macro MMU__STATUS]
+gcode = MMU_STATUS
+
+[gcode_macro MMU__MOTORS_OFF]
+gcode = MMU_MOTORS_OFF
+
+[gcode_macro MMU__SERVO]
+gcode = 
+	{% set pos = params.POS|default("up")|string %}
+	MMU_SERVO POS={pos}
+
+[gcode_macro MMU__SELECT_TOOL]
+gcode = 
+	{% set tool = params.TOOL|default(0)|int %}
+	MMU_SELECT TOOL={tool}
+
+[gcode_macro MMU__SELECT_BYPASS]
+gcode = MMU_SELECT_BYPASS
+
+[gcode_macro MMU__LOAD_BYPASS]
+gcode = MMU_LOAD
+
+[gcode_macro MMU__RECOVER]
+gcode = MMU_RECOVER
+
+[gcode_macro MMU__PRELOAD]
+gcode = 
+	MMU_PRELOAD {rawparams}
+
+[gcode_macro MMU__CHECK_GATE]
+gcode = 
+	{% set gate = params.GATE|default(-1)|int %}
+	{% set tool = params.GATE|default(-1)|int %}
+	{% set gates = params.GATE|default('!')|string %}
+	{% set tools = params.GATE|default('!')|string %}
+	MMU_CHECK_GATE GATE={gate} TOOL={tool} GATES={gates} TOOLS={tools}
+
+[gcode_macro MMU_CHANGE_TOOL_STANDALONE]
+description = Convenience macro for inclusion in print_start for initial tool load
+gcode = 
+	MMU_CHANGE_TOOL {rawparams} STANDALONE=1
+
+[gcode_macro MMU_CHECK_GATES]
+description = Alias for updated macro name of MMU_CHECK_GATE
+gcode = 
+	MMU_CHECK_GATE ALL=1
+
+[gcode_macro MMU_REMAP_TTG]
+description = Alias for updated macro name of MMU_TTG_MAP
+gcode = 
+	MMU_TTG_MAP {rawparams}
+
+[gcode_macro MMU_FORM_TIP]
+description = Alias for updated macro name of MMU_TEST_FORM_TIP
+gcode = 
+	MMU_TEST_FORM_TIP {rawparams}
+
+[gcode_macro _MMU_PRINT_START]
+description = Alias for updated macro name of MMU_PRINT_START
+gcode = 
+	MMU_PRINT_START {rawparams}
+
+[gcode_macro _MMU_PRINT_END]
+description = Alias for updated macro name of MMU_PRINT_END
+gcode = 
+	MMU_PRINT_END {rawparams}
+
+[gcode_macro _MMU_UPDATE_HEIGHT]
+description = Alias for updated macro name of MMU_UPDATE_HEIGHT
+gcode = 
+	MMU_UPDATE_HEIGHT {rawparams}
+
+[gcode_macro _MMU_ACTION_CHANGED]
+description = Called when an action has changed
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_STATE_VARS'] %}
+	{% set action = params.ACTION|string %}
+	{% set old_action = params.OLD_ACTION|string %}
+	
+	{% if not vars.user_action_changed_extension == "" %}
+	{vars.user_action_changed_extension} {rawparams}
+	{% endif %}
+
+[gcode_macro _MMU_PRINT_STATE_CHANGED]
+description = Called when print state changes
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_STATE_VARS'] %}
+	{% set state = params.STATE|string %}
+	{% set old_state = params.OLD_STATE|string %}
+	
+	{% if not vars.user_print_state_changed_extension == "" %}
+	{vars.user_print_state_changed_extension} {rawparams}
+	{% endif %}
+
+[gcode_macro _MMU_EVENT]
+description = Called when certain MMU actions occur
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_STATE_VARS'] %}
+	{% set servo_down_limit = vars.servo_down_limit|default(-1)|int %}
+	{% set cutter_blade_limit = vars.cutter_blade_limit|default(-1)|int %}
+	{% set event = params.EVENT|string %}
+	
+	{% if event == "restart" %}
+	MMU_STATS COUNTER=mmu_restarts INCR=1
+	
+	{% set vendor = printer.configfile.config.mmu_machine.mmu_vendor|string|lower %}
+	{% set version = printer.configfile.config.mmu_machine.mmu_version|string|lower %}
+	{% if vendor == "ercf" %}
+	MMU_STATS COUNTER=servo_down LIMIT={servo_down_limit} WARNING="Inspect servo arm for wear/damage"
+	MMU_STATS COUNTER=cutter_blade LIMIT={cutter_blade_limit} WARNING="Inspect/replace filament cutting blade"
+	{% elif vendor == "tradrack" %}
+	MMU_STATS COUNTER=servo_down LIMIT={servo_down_limit} WARNING="Inspect servo mechanism for wear/damage"
+	MMU_STATS COUNTER=cutter_blade LIMIT={cutter_blade_limit} WARNING="Inspect/replace filament cutting blade"
+	{% endif %}
+	
+	{% elif event == "gate_map_changed" %}
+	{% elif event == "filament_gripped" %}
+	MMU_STATS COUNTER=servo_down INCR=1
+	{% elif event == "filament_cut" %}
+	MMU_STATS COUNTER=cutter_blade INCR=1
+	{% endif %}
+	
+	{% if not vars.user_mmu_event_extension == "" %}
+	{vars.user_mmu_event_extension} {rawparams}
+	{% endif %}
+
+[mcu]
+serial = /dev/serial/by-id/usb-Klipper_QIDI_MAIN_V2_1.0.4_2A6132373534350734343539-if00
+restart_method = command
+
+[mcu TH]
+serial = /dev/ttyS4
+restart_method = command
+baud = 500000
+
+[printer]
+kinematics = corexy
+max_velocity = 600
+max_accel = 20000
+max_z_velocity = 20
+max_z_accel = 500
+square_corner_velocity = 8
+
+[resonance_tester]
+accel_per_hz = 150
+max_smoothing = 0.25
+accel_chip = lis2dw
+probe_points = 
+	135, 135, 10
+
+[duplicate_pin_override]
+pins = 
+	TH:PA11
+
+[filament_switch_sensor Entry]
+pause_on_runout = True
+runout_gcode = 
+	M118 Filament run out
+insert_gcode = 
+event_delay = 3.0
+pause_delay = 0.5
+switch_pin = !TH:PA1
+
+[bed_screws]
+screw1 = 30,30
+screw1_name = Front left
+screw2 = 240,30
+screw2_name = Front right
+screw3 = 240,240
+screw3_name = Last right
+screw4 = 30,240
+
+[force_move]
+enable_force_move = True
+
+[tmc2209 extruder]
+uart_pin = TH:PC13
+interpolate = True
+run_current = 0.857
+stealthchop_threshold = 0
+
+[lis2dw]
+cs_pin = THR:PA10
+spi_software_sclk_pin = THR:PA5
+spi_software_mosi_pin = THR:PA7
+spi_software_miso_pin = THR:PA6
+axes_map = y, z, -x
+
+[stepper_x]
+step_pin = PB4
+dir_pin = !PB3
+enable_pin = !PB5
+microsteps = 16
+rotation_distance = 38.82
+full_steps_per_rotation = 200
+endstop_pin = tmc2240_stepper_x:virtual_endstop
+position_min = -1
+position_endstop = 271
+position_max = 275
+homing_speed = 50
+homing_retract_dist = 0
+homing_positive_dir = true
+
+[stepper_y]
+step_pin = PC14
+dir_pin = !PC13
+enable_pin = !PC15
+microsteps = 16
+rotation_distance = 38.82
+full_steps_per_rotation = 200
+endstop_pin = tmc2240_stepper_y:virtual_endstop
+position_min = -1
+position_endstop = -1
+position_max = 295
+homing_speed = 50
+homing_retract_dist = 0
+homing_positive_dir = False
+
+[stepper_z]
+step_pin = PC10
+dir_pin = PA15
+enable_pin = !PC11
+microsteps = 128
+rotation_distance = 4
+full_steps_per_rotation = 200
+endstop_pin = probe:z_virtual_endstop
+position_max = 265
+position_min = -2
+homing_speed = 10
+second_homing_speed = 5
+homing_retract_dist = 10.0
+homing_positive_dir = false
+
+[stepper_z1]
+step_pin = PB1
+dir_pin = PB6
+enable_pin = !PB0
+microsteps = 128
+rotation_distance = 4
+full_steps_per_rotation = 200
+
+[z_tilt]
+z_positions = 
+	-15,137
+	285,137
+points = 
+	10,137
+	260,137
+speed = 150
+horizontal_move_z = 5
+retries = 2
+retry_tolerance = 0.05
+
+[tmc2240 stepper_x]
+spi_software_sclk_pin = PA5
+spi_software_miso_pin = PA6
+spi_software_mosi_pin = PA7
+spi_speed = 200000
+cs_pin = PC12
+diag0_pin = !PB8
+interpolate = true
+run_current = 1.07
+stealthchop_threshold = 0
+driver_sgt = 1
+
+[tmc2240 stepper_y]
+spi_software_sclk_pin = PA5
+spi_software_miso_pin = PA6
+spi_software_mosi_pin = PA7
+spi_speed = 200000
+cs_pin = PD2
+diag0_pin = !PC0
+interpolate = true
+run_current = 1.07
+stealthchop_threshold = 0
+driver_sgt = 1
+
+[tmc2209 stepper_z1]
+uart_pin = PB7
+run_current = 1.07
+interpolate = True
+stealthchop_threshold = 9999999999
+diag_pin = ^PA14
+driver_sgthrs = 140
+
+[tmc2209 stepper_z]
+uart_pin = PC5
+run_current = 1.07
+interpolate = True
+stealthchop_threshold = 9999999999
+diag_pin = ^PC1
+driver_sgthrs = 140
+
+[heater_bed]
+heater_pin = PC7
+sensor_type = NTC 100K MGB18-104F39050L32
+sensor_pin = PA4
+max_power = 1.0
+control = pid
+pid_kp = 71.231
+pid_ki = 1.218
+pid_kd = 1041.758
+pwm_cycle_time = 0.1
+min_temp = -60
+max_temp = 125
+
+[heater_generic chamber]
+heater_pin = PC8
+max_power = 1
+sensor_type = NTC 100K MGB18-104F39050L32
+sensor_pin = PA1
+control = pid
+pid_kp = 63.418
+pid_ki = 1.342
+pid_kd = 749.125
+min_temp = -100
+max_temp = 70
+z_max_limit = 230
+
+[verify_heater chamber]
+max_error = 300
+check_gain_time = 480
+hysteresis = 5
+heating_gain = 1
+
+[temperature_sensor Chamber_Thermal_Protection_Sensor]
+sensor_type = NTC 100K MGB18-104F39050L32
+sensor_pin = PA2
+min_temp = -100
+max_temp = 130
+
+[verify_heater extruder]
+max_error = 120
+check_gain_time = 20
+hysteresis = 2
+heating_gain = 2
+
+[verify_heater heater_bed]
+max_error = 400
+check_gain_time = 120
+hysteresis = 2
+heating_gain = 1
+
+[fan_generic chamber_circulation_fan]
+pin = PA10
+shutdown_speed = 0.0
+cycle_time = 0.0100
+hardware_pwm = false
+kick_start_time = 0.100
+off_below = 0.0
+
+[controller_fan chamber_fan]
+pin = PB14
+max_power = 1.0
+shutdown_speed = 0
+kick_start_time = 0.5
+heater = chamber
+fan_speed = 1.0
+off_below = 0
+tachometer_pin = PC6
+tachometer_ppr = 2
+tachometer_poll_interval = 0.0015
+stepper = 
+
+[heater_fan hotend_fan]
+pin = TH:PA11
+max_power = 1.0
+shutdown_speed = 1.0
+kick_start_time = 0.5
+heater = extruder
+heater_temp = 50.0
+fan_speed = 1.0
+off_below = 0
+tachometer_pin = TH:PA12
+tachometer_ppr = 2
+tachometer_poll_interval = 0.0015
+
+[fan_generic cooling_fan]
+pin = TH:PA8
+max_power = 1.0
+shutdown_speed = 0
+cycle_time = 0.010
+hardware_pwm = False
+kick_start_time = 0.100
+off_below = 0.0
+tachometer_pin = TH:PA9
+tachometer_ppr = 2
+tachometer_poll_interval = 0.0015
+
+[controller_fan board_fan]
+pin = PA9
+max_power = 1.0
+shutdown_speed = 1.0
+cycle_time = 0.01
+fan_speed = 1.0
+stepper = stepper_z,stepper_z1
+
+[fan_generic auxiliary_cooling_fan]
+pin = PB15
+shutdown_speed = 0.0
+cycle_time = 0.0100
+hardware_pwm = false
+kick_start_time = 0.100
+off_below = 0.0
+tachometer_pin = PC4
+tachometer_ppr = 2
+tachometer_poll_interval = 0.0015
+
+[output_pin Polar_cooler]
+pin = PB10
+pwm = false
+shutdown_value = 0
+value = 0
+
+[output_pin beeper]
+pin = PC2
+pwm = false
+shutdown_value = 0
+value = 0
+
+[output_pin caselight]
+pin = PC9
+pwm = false
+shutdown_value = 0
+value = 1
+
+[probe_air]
+sensor_type = c_sensor
+sclk_pin = TH:PB3
+dout_pin = TH:PB4
+voltage = 4.95
+delta_v = 0.08
+z_offset = -0.07
+speed = 5
+lift_speed = 5
+samples = 2
+sample_retract_dist = 3
+samples_result = average
+samples_tolerance = 0.02
+samples_tolerance_retries = 10
+
+[bed_mesh]
+speed = 100
+horizontal_move_z = 5
+mesh_min = 10,10
+mesh_max = 260,260
+probe_count = 6,6
+algorithm = lagrange
+mesh_pps = 2, 2
+
+[exclude_object]
+
+[input_shaper]
+shaper_type_x = 3hump_ei
+shaper_freq_x = 82.4
+shaper_type_y = mzv
+shaper_freq_y = 51.0
+
+[bed_mesh kamp]
+version = 1
+points = 
+	0.171250, 0.113047, 0.042344, 0.001797
+	0.110156, 0.081953, 0.073047, 0.040234
+	0.067969, 0.081797, 0.069297, 0.048281
+	0.066875, 0.079141, 0.076172, 0.065312
+	0.112578, 0.142891, 0.139297, 0.119141
+	0.163750, 0.152500, 0.188906, 0.111719
+x_count = 4
+y_count = 6
+mesh_x_pps = 2
+mesh_y_pps = 2
+algo = lagrange
+tension = 0.2
+min_x = 60.0
+max_x = 210.0
+min_y = 10.0
+max_y = 260.0
+=======================
+MMU: Sharing gear stepper config rotation_distance=13.6 with stepper_mmu_gear_1
+MMU: Sharing gear stepper config gear_ratio=1:1 with stepper_mmu_gear_1
+MMU: Sharing gear stepper config microsteps=16 with stepper_mmu_gear_1
+MMU: Sharing gear stepper config full_steps_per_rotation=200 with stepper_mmu_gear_1
+MMU: Sharing gear stepper config rotation_distance=13.6 with stepper_mmu_gear_2
+MMU: Sharing gear stepper config gear_ratio=1:1 with stepper_mmu_gear_2
+MMU: Sharing gear stepper config microsteps=16 with stepper_mmu_gear_2
+MMU: Sharing gear stepper config full_steps_per_rotation=200 with stepper_mmu_gear_2
+MMU: Sharing gear stepper config rotation_distance=13.6 with stepper_mmu_gear_3
+MMU: Sharing gear stepper config gear_ratio=1:1 with stepper_mmu_gear_3
+MMU: Sharing gear stepper config microsteps=16 with stepper_mmu_gear_3
+MMU: Sharing gear stepper config full_steps_per_rotation=200 with stepper_mmu_gear_3
+Config error
+Traceback (most recent call last):
+  File "/home/mks/klipper/klippy/klippy.py", line 133, in _connect
+    self._read_config()
+  File "/home/mks/klipper/klippy/klippy.py", line 126, in _read_config
+    self.load_object(config, section_config.get_name(), None)
+  File "/home/mks/klipper/klippy/klippy.py", line 115, in load_object
+    self.objects[section] = init_func(config.getsection(section))
+  File "/home/mks/klipper/klippy/extras/mmu_sensors.py", line 392, in load_config
+    return MmuSensors(config)
+  File "/home/mks/klipper/klippy/extras/mmu_sensors.py", line 278, in __init__
+    self._create_mmu_sensor(config, Mmu.SENSOR_EXTRUDER_ENTRY, None, switch_pin, event_delay, insert=True, runout=True)
+  File "/home/mks/klipper/klippy/extras/mmu_sensors.py", line 301, in _create_mmu_sensor
+    if not self._is_empty_pin(switch_pin):
+  File "/home/mks/klipper/klippy/extras/mmu_sensors.py", line 322, in _is_empty_pin
+    pin_params = ppins.parse_pin(switch_pin, can_invert=True, can_pullup=True)
+  File "/home/mks/klipper/klippy/pins.py", line 83, in parse_pin
+    raise error("Unknown pin chip name '%s'" % (chip_name,))
+pins.error: Unknown pin chip name 'THR'
+webhooks client 548638539840: New connection
+webhooks client 548638539840: Client info {'program': 'Moonraker', 'version': '?'}
+Unable to issue reset command on MCU 'mcu'
+Attempting MCU 'mmu' reset
+Unable to issue reset command on MCU 'TH'
+webhooks client 548638539840: Disconnected
+Restarting printer
+Start printer at Tue Dec  9 21:05:18 2025 (1765335918.1 579.2)
+===== Config file =====
+[gcode_macro CLEAN_NOZZLE]
+variable_x1 = 114
+variable_x2 = 100
+variable_f = 5000
+variable_count = 4
+gcode = 
+	{% set vars = printer["gcode_macro CLEAN_NOZZLE"] %}
+	{% set count = vars.count | int %}
+	{% set hotendtemp = params.HOTEND|default(250)|int %}
+	PURGE_PARK
+	M400
+	SET_HEATER_TEMPERATURE HEATER=extruder TARGET={hotendtemp}
+	TEMPERATURE_WAIT SENSOR=extruder MINIMUM={hotendtemp}
+	G92 E0
+	G1 E-2 F200
+	M400
+	M106 S255
+	G4 P1000
+	M104 S150
+	{% for i in range(count) %}
+	G1 X{vars.x1} F{vars.f}
+	G1 X{vars.x2} F{vars.f}
+	{% endfor %}
+	
+	
+	G1 X125 F15000
+	G1 X130 Y280 F6000
+	G1 Z-0.2 F600
+	SET_HEATER_TEMPERATURE HEATER=extruder TARGET=150
+	TEMPERATURE_WAIT SENSOR=extruder MAXIMUM=155
+	M106 S255
+	G2 I0.5 J0.5 F600
+	G2 I0.5 J0.5 F600
+	G2 I0.5 J0.5 F600
+	G1 X140 F200
+	G1 Y281 F200
+	G1 X130 F200
+	G1 Y283 F200
+	G1 X140 F200
+	
+	G2 I0.5 J0.5 F600
+	G2 I0.5 J0.5 F600
+	G2 I0.5 J0.5 F600
+	
+	G1 Z1
+	G1 X180 F12000
+	G1 Z-1.5
+	G1 X164 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	G1 Y284 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	G1 X180 F12000
+	G1 X164 F12000
+	M400
+	M118 Nozzle cleaned
+	G1 Z30 F900
+	M106 S0
+
+[gcode_macro DISABLE_ALL_HEATERS_FANS]
+description = Turn off all heaters and fans
+gcode = 
+	
+	TURN_OFF_HEATERS
+	
+	SET_FAN_SPEED FAN=cooling_fan SPEED=0
+	SET_FAN_SPEED FAN=auxiliary_cooling_fan SPEED=0
+	SET_FAN_SPEED FAN=chamber_circulation_fan SPEED=0
+
+[gcode_macro PRINTER_PARAM]
+variable_max_x_position = 270.0
+variable_max_y_position = 270.0
+variable_max_z_position = 260.0
+variable_clear_x_position = 88.0
+variable_clear_y_position = 287.0
+gcode = 
+
+[gcode_macro SHAKE_OOZE]
+gcode = 
+	MOVE_TO_TRASH
+	M204 S2000
+	M400
+	G4 P500
+	G91
+	{% for y in range(1,14) %}
+	G1 Y-1 F20000
+	
+	G1 Y1 F20000
+	
+	{% endfor %}
+	G90
+
+[gcode_macro MOVE_TO_TRASH]
+gcode = 
+	
+	
+	{% if "xy" not in printer.toolhead.homed_axes %}
+	G28 X Y
+	{% endif %}
+	M204 S5000
+	{% if (printer.gcode_move.position.y) > 270 %}
+	{% if (printer.gcode_move.position.x) > 112 or (printer.gcode_move.position.x) < 85 %}
+	G1 Y270 F20000
+	G1 X85 F20000
+	G1 Y270 F20000
+	G1 Y287.5 F3000
+	{% endif %}
+	G1 X85 F20000
+	G1 Y287.5 F3000
+	{% else %}
+	G1 X85 F20000
+	G1 Y260 F20000
+	G1 Y287.5 F3000
+	{% endif %}
+
+[gcode_macro EXTRUSION_AND_FLUSH]
+gcode = 
+	{% set hotendtemp = params.HOTEND|int %}
+	MOVE_TO_TRASH
+	M109 S{hotendtemp}
+	M83
+	{% for i in range(4) %}
+	G1 X{85 + i % 2 * 3} F5000
+	{% for j in range(1,6) %}
+	G1 E9 F300
+	G1 E1 F50
+	{% endfor %}
+	{% endfor %}
+	G1 E-1 F1800
+	M400
+	M106 S255
+	M400
+	G4 P5000
+	CLEAR_OOZE
+	CLEAR_FLUSH
+	MOVE_TO_TRASH
+	M106 S0
+
+[gcode_macro SHAPER_CALIBRATE]
+rename_existing = RESHAPER_CALIBRATE
+gcode = 
+	RESHAPER_CALIBRATE FREQ_START=20 FREQ_END=150
+
+[gcode_macro PRINT_END]
+gcode = 
+	M400
+	save_zoffset
+	SET_IDLE_TIMEOUT TIMEOUT={printer.configfile.settings.idle_timeout.timeout}
+	CLEAR_PAUSE
+	M106 P2 S0
+	M106 P0 S0
+	
+	DISABLE_BOX_HEATER
+	
+	M104 S0
+	M140 S0
+	M141 S0
+	
+	M220 S100
+	M221 S100
+	M84
+	
+	DISABLE_ALL_SENSOR
+	{% if printer.save_variables.variables.box_count >= 1 and printer.save_variables.variables.enable_box == 1 and printer["box_extras"]%}
+	BUFFER_MONITORING ENABLE=0
+	{% endif %}
+	
+	BED_MESH_CLEAR
+	G31
+	CLEAR_LAST_FILE
+	BEEP I=2 DUR=500
+	SDCARD_RESET_FILE
+
+[gcode_macro CANCEL_PRINT]
+rename_existing = BASE_CANCEL_PRINT
+gcode = 
+	{% if "xyz" in printer.toolhead.homed_axes %}
+	M204 S10000
+	G90
+	{% if (printer.gcode_move.position.z) < 100 %}
+	G1 Z100 F600
+	{% endif %}
+	{% if (printer.gcode_move.position.y) > printer['gcode_macro PRINTER_PARAM'].max_y_position %}
+	G1 Y{printer['gcode_macro PRINTER_PARAM'].max_y_position - 50} F6000
+	{% endif %}
+	G1  X265 Y5 F7800
+	{% endif %}
+	M400
+	save_zoffset
+	SET_IDLE_TIMEOUT TIMEOUT={printer.configfile.settings.idle_timeout.timeout}
+	
+	M106 P2 S0
+	M106 P0 S0
+	M106 P3 S0
+	
+	M104 S0
+	M140 S0
+	M141 S0
+	
+	M220 S100
+	M221 S100
+	M84
+	
+	DISABLE_ALL_SENSOR
+	SET_GCODE_OFFSET Z=0 MOVE=0
+	BED_MESH_CLEAR
+	G31
+	BEEP I=2 DUR=500
+	
+	BASE_CANCEL_PRINT
+	CLEAR_LAST_FILE
+	M118 Canceled print!
+
+[gcode_macro M141]
+gcode = 
+	{% if printer["heater_generic chamber"] is defined %}
+	{% set s = params.S|float %}
+	SET_HEATER_TEMPERATURE HEATER=chamber TARGET={([s, 65]|min)}
+	{% endif %}
+
+[gcode_macro M191]
+gcode = 
+	{% if printer["heater_generic chamber"] is defined %}
+	{% set s = params.S|float %}
+	
+	M141 {% for p in params %}{'%s%s' % (p, params[p])}{% endfor %}
+	{% if s != 0 %}
+	TEMPERATURE_WAIT SENSOR="heater_generic chamber" MINIMUM={([s, 65]|min)-2}
+	{% endif %}
+	{% endif %}
+
+[gcode_macro M107]
+gcode = 
+	SET_FAN_SPEED FAN=cooling_fan SPEED=0
+
+[gcode_macro M290]
+gcode = 
+	SET_GCODE_OFFSET Z_ADJUST={params.Z}
+
+[gcode_macro CUT_FILAMENT_1]
+gcode = 
+	{% if "xy" not in printer.toolhead.homed_axes %}
+	G28 X Y
+	{% endif %}
+	M204 S10000
+	{% if (printer.gcode_move.position.x) < 15 %}
+	G1 X15 F9000
+	G1 Y0.5 F9000
+	{% endif %}
+	G1 Y0.5 F15000
+	G1 X15 F15000
+	G1 X-0.5 F5000
+	G4 P1000
+	G1 X1 F1000
+	G1 X-0.5 F5000
+	G4 P1000
+	G1 X1 F1000
+	G4 P1000
+	G1 X15 F3000
+
+[gcode_macro M603]
+description = filament unlode
+gcode = 
+	DISABLE_ALL_SENSOR
+	{% set hotendtemp = params.S|default(250)|int %}
+	_CG28
+	M104 S{hotendtemp}
+	
+	MOVE_TO_TRASH
+	M109 S{hotendtemp}
+	M118 Heat up complete
+	
+	G92 E0
+	G1 E-10 F300
+	
+	
+	
+	
+	CUT_FILAMENT_1
+	MOVE_TO_TRASH
+	G92 E0
+	G1 E-60 F300
+	
+	
+	M104 S0
+	
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position + 20} F15000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position} F5000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position + 20} F15000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position} F5000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position + 20} F15000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position} F5000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position + 20} F15000
+	G1 X{printer['gcode_macro PRINTER_PARAM'].clear_x_position} F5000
+	
+	M106 S0
+	M400
+	M118 Unload finish
+
+[gcode_macro M604]
+gcode = 
+	DISABLE_ALL_SENSOR
+	{% set hotendtemp = params.S|default(250)|int %}
+	{% set mode = params.T|default(0)|int %}
+	{% if mode == 0 %}
+	_CG28
+	MOVE_TO_TRASH
+	{% endif %}
+	
+	
+	
+	
+	{% if mode == 0 %}
+	M104 S{hotendtemp}
+	MOVE_TO_TRASH
+	M109 S{hotendtemp}
+	M118 Heat up complete
+	G92 E0
+	G1 E80 F400
+	M400
+	{% elif mode ==1 %}
+	MOVE_TO_TRASH
+	M109 S{hotendtemp}
+	M118 Heat up complete
+	G92 E0
+	G1 E80 F400
+	M400
+	{% endif %}
+	M118 Load finish
+
+[gcode_macro _Sensorless_Homing_Variables]
+description = Variables for sensorless homing
+variable_z_hop_distance = 10
+variable_first_homed_axis = 'Y'
+variable_safe_z_enable = True
+variable_safe_x = -128
+variable_safe_y = -128
+gcode = 
+
+[homing_override]
+axes = xyz
+gcode = 
+	{% set home_all = 'X' not in params and 'Y' not in params and 'Z' not in params %}
+	{% set z_hop_speed = (printer.configfile.settings['stepper_z'].homing_speed * 60) | float %}
+	{% set travel_speed = (printer.toolhead.max_velocity * 60) | float %}
+	{% set sensorless_variables = printer["gcode_macro _Sensorless_Homing_Variables"] %}
+	{% set z_hop_distance = sensorless_variables.z_hop_distance | float %}
+	{% set first_homed_axis = sensorless_variables.first_homed_axis | string %}
+	{% set safe_x = sensorless_variables.safe_x | float %}
+	{% set safe_y = sensorless_variables.safe_y | float %}
+	{% set safe_z = sensorless_variables.safe_z_enable | abs %}
+	{% set chamber = printer["heater_generic chamber"].target|int %}
+	
+	
+	{% if safe_x == -128 %}
+	{% set safe_x = (printer.configfile.settings.stepper_x.position_max) /2 %}
+	{% endif %}
+	
+	
+	
+	{% if safe_y == -128 %}
+	{% set safe_y = (printer.configfile.settings.stepper_y.position_max) /2 %}
+	{% endif %}
+	
+	
+	{% if z_hop_distance > 0 %}
+	{% if 'x' not in printer.toolhead.homed_axes and 'y' not in printer.toolhead.homed_axes %}
+	SET_KINEMATIC_POSITION Z=0
+	G0 Z{z_hop_distance} F{z_hop_speed}
+	{% endif %}
+	{% endif %}
+	
+	{% if first_homed_axis == 'X' %}
+	{% if home_all or 'X' in params %}
+	_HOME_X
+	{% endif %}
+	{% if home_all or 'Y' in params %}
+	_HOME_Y
+	{% endif %}
+	{% endif %}
+	
+	{% if first_homed_axis == 'Y' %}
+	{% if home_all or 'Y' in params %}
+	_HOME_Y
+	{% endif %}
+	{% if home_all or 'X' in params %}
+	_HOME_X
+	{% endif %}
+	{% endif %}
+	
+	{% if safe_z == 1 and (('Z' in params) or home_all) and ('Z' not in printer.toolhead.homed_axes) %}
+	{% if (printer.toolhead.position.z|float < 10) %}
+	SET_KINEMATIC_POSITION Z=0
+	G1 Z{z_hop_distance} F{z_hop_speed}
+	{% endif %}
+	G0 X{safe_x} Y{safe_y} F{travel_speed}
+	{% endif %}
+	
+	{% if home_all or 'Z' in params %}
+	
+	{% set extruder_target = printer.extruder.target|default(0) %}
+	{% set bed_target = printer.heater_bed.target|default(0) %}
+	{% set chamber_target = printer['heater_generic chamber'].target|default(0) %}
+	
+	G90
+	M106 S255
+	M109 S150
+	TURN_OFF_HEATERS
+	SET_FAN_SPEED FAN=cooling_fan SPEED=0
+	SET_FAN_SPEED FAN=auxiliary_cooling_fan SPEED=0
+	SET_FAN_SPEED FAN=chamber_circulation_fan SPEED=0
+	SET_GCODE_OFFSET Z=0 MOVE=0
+	{% set base_x  = printer['gcode_macro PRINTER_PARAM'].max_x_position/2 | float %}
+	{% set base_y  = printer['gcode_macro PRINTER_PARAM'].max_y_position/2 | float %}
+	{% set safe_x  = range((base_x - 10)|int, (base_x + 10)|int + 1) | random %}
+	{% set safe_y  = range((base_y - 10)|int, (base_y + 10)|int + 1) | random %}
+	G0 X{safe_x} Y{safe_y} F7800
+	G28 Z
+	G1 Z10 F2000
+	
+	
+	SET_HEATER_TEMPERATURE HEATER=bed TARGET={bed_target}
+	SET_HEATER_TEMPERATURE HEATER=extruder TARGET={extruder_target}
+	{% if chamber_target > 0 %}
+	SET_HEATER_TEMPERATURE HEATER=chamber TARGET={chamber_target}
+	{% endif %}
+	
+	{% endif %}
+
+[gcode_macro _HOME_XY]
+gcode = 
+	_HOME_Y
+	_HOME_X
+	_HOME_Y
+
+[gcode_macro save_zoffset]
+gcode = 
+	{% if printer.gcode_move.homing_origin.z < 0.5 %}
+	SAVE_VARIABLE VARIABLE=z_offset VALUE={printer.gcode_move.homing_origin.z}
+	{% endif %}
+
+[gcode_macro set_zoffset]
+gcode = 
+	{% set z = printer.save_variables.variables.z_offset|default(0) %}
+	SET_GCODE_OFFSET Z={z} MOVE=0
+
+[gcode_macro M106]
+gcode = 
+	{% set p = params.P|default(0)|int %}
+	
+	{% if p == 2 %}
+	{% if params.S is defined %}
+	SET_FAN_SPEED FAN=auxiliary_cooling_fan SPEED={(params.S|float / 255.0)}
+	{% else %}
+	SET_FAN_SPEED FAN=auxiliary_cooling_fan SPEED=1
+	{% endif %}
+	{% endif %}
+	
+	{% if p == 0 %}
+	{% if params.S is defined %}
+	SET_FAN_SPEED FAN=cooling_fan SPEED={(params.S|float / 255.0)}
+	
+	{% else %}
+	SET_FAN_SPEED FAN=cooling_fan SPEED=1
+	{% endif %}
+	{% endif %}
+	
+	{% if p == 3 %}
+	{% if params.S is defined %}
+	SET_FAN_SPEED FAN=chamber_circulation_fan SPEED={(params.S|float / 255.0)}
+	{% else %}
+	SET_FAN_SPEED FAN=chamber_circulation_fan SPEED=1
+	{% endif %}
+	{% endif %}
+	
+	{% if p == 4 %}
+	{% if params.S is defined %}
+	SET_PIN PIN=Polar_cooler VALUE={1 if (params.S|int / 255) > 0 else 0}
+	{% else %}
+	SET_PIN PIN=Polar_cooler VALUE=1
+	{% endif %}
+	{% endif %}
+
+[gcode_macro BEEP]
+gcode = 
+	{% set i = params.I|default(1)|int %}
+	{% set dur = params.DUR|default(100)|int %}
+	{% set beep = printer.save_variables.variables.beep|default(0) %}
+	
+	{% if beep == 1 %}
+	{% for iteration in range(i|int) %}
+	SET_PIN PIN=beeper VALUE=1
+	G4 P{dur}
+	SET_PIN PIN=beeper VALUE=0
+	G4 P{dur}
+	{% endfor %}
+	{% endif %}
+
+[gcode_macro beep_on]
+gcode = 
+	SAVE_VARIABLE VARIABLE=beep VALUE=1
+
+[gcode_macro beep_off]
+gcode = 
+	SAVE_VARIABLE VARIABLE=beep VALUE=0
+
+[gcode_macro LED_ON]
+gcode = 
+	SET_PIN PIN=caselight VALUE=1
+
+[gcode_macro LED_OFF]
+gcode = 
+	SET_PIN PIN=caselight VALUE=0
+
+[gcode_macro PRINT_START]
+gcode = 
+	{% set bedtemp = params.get('BED') | int %}
+	{% set hotendtemp = params.get('HOTEND') | int %}
+	{% set chambertemp = params.get('CHAMBER', 0) | int %}
+	
+	CLEAR_PAUSE
+	SET_HEATER_TEMPERATURE HEATER=bed TARGET={bedtemp}
+	SET_HEATER_TEMPERATURE HEATER="heater_generic chamber" TARGET={chambertemp}
+	{% if chambertemp != 0 %}
+	SET_FAN_SPEED FAN=chamber_circulation_fan SPEED=.5
+	{% endif %}
+	TEMPERATURE_WAIT SENSOR=bed MINIMUM={bedtemp - 2}
+	TEMPERATURE_WAIT SENSOR="heater_generic chamber" MINIMUM={chambertemp - 2}
+	SET_FAN_SPEED FAN=auxiliary_cooling_fan SPEED=0
+	
+	G28
+	CLEAN_NOZZLE HOTEND={hotendtemp}
+	SET_GCODE_OFFSET Z=0 MOVE=0
+	G28 Z
+	Z_TILT_ADJUST
+	G28 Z
+	BED_MESH_CALIBRATE profile=adaptive adaptive=1
+	set_zoffset
+	SET_HEATER_TEMPERATURE HEATER=extruder TARGET={hotendtemp}
+	TEMPERATURE_WAIT SENSOR=extruder MINIMUM={hotendtemp - 2} MAXIMUM={hotendtemp + 5}
+
+[gcode_macro PURGE_VARIABLES]
+description = Variables
+variable_purge_spd = 400
+variable_purge_temp_min = 200
+variable_purge_x = 85
+variable_purge_y = 287.5
+variable_purge_x_entry = 85
+variable_purge_y_entry = 270
+variable_z_min = 20
+variable_travel_speed = 300
+variable_entry_speed = 50
+variable_z_lift = 0
+variable_wipe_qty = 2
+variable_travel_spd_xy = 18000
+variable_travel_spd_z = 1000
+variable_wipe_spd_xy = 18000
+variable_brush_accel = 12000
+variable_purge_fan_speed = 0.4
+variable_wipe_fan_speed = 0.8
+variable_brush_y_position = 280
+variable_brush_start = 164
+variable_brush_width = 23
+variable_brush_depth = 6
+variable_pressure_release_time = 1000
+variable_part_cooling_fan = 1
+variable_purge_length_minimum = 20
+variable_purge_length_maximum = 80
+variable_purge_length = 40
+variable_purge_length_modifier = 1
+variable_purge_length_addition = 0
+gcode = 
+
+[gcode_macro BUCKET_PURGE]
+gcode = 
+	{% set vars = printer['gcode_macro PURGE_VARIABLES'] %}
+	
+	
+	
+	
+	
+	
+	SAVE_GCODE_STATE NAME=BUCKET_PURGE_state
+	
+	
+	
+	
+	
+	
+	{% if "xyz" not in printer.toolhead.homed_axes %}
+	RESPOND MSG="PURGE: Not homed! Home xyz before purging"
+	{% else %}
+	
+	
+	
+	
+	{% set backup_feedrate = printer.gcode_move.speed_factor %}
+	M220 S100
+	
+	
+	
+	
+	
+	{% set sequence_vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set filament_diameter = printer.configfile.config.extruder.filament_diameter|float %}
+	{% set filament_cross_section = (filament_diameter/2) ** 2 * 3.1415 %}
+	{% set from_tool = printer.mmu.last_tool %}
+	{% set to_tool = printer.mmu.tool %}
+	{% set pos = printer.gcode_move.gcode_position %}
+	{% set pos_max = printer.toolhead.axis_maximum %}
+	{% set backup_fan_speed = printer["fan_generic cooling_fan"].speed %}
+	
+	
+	{% set pv = printer.mmu.slicer_tool_map.purge_volumes %}
+	
+	
+	
+	
+	
+	{% if params.PURGE_LENGTH %}
+	{action_respond_info("PURGE: param PURGE_LENGTH provided")}
+	{% set purge_len = params.PURGE_LENGTH|float %}
+	{% elif from_tool == to_tool and to_tool >= 0 %}
+	{action_respond_info("PURGE: Tool didn't change (T%s > T%s), %s" % (from_tool, to_tool, "priming" if vars.purge_length_minimum else "skipping"))}
+	{% set purge_len = 0 %}
+	
+	{% elif pv %}
+	{% if from_tool < 0 and to_tool >= 0%}
+	{action_respond_info("PURGE: from tool unknown. Finding largest value for T? > T%d" % to_tool)}
+	{% set purge_vol = pv|map(attribute=to_tool)|max %}
+	{% elif to_tool < 0 %}
+	{action_respond_info("PURGE: tool(s) unknown. Finding largest value")}
+	{% set purge_vol = pv|map('max')|max %}
+	{% else %}
+	{% set purge_vol = pv[from_tool][to_tool]|float * vars.purge_length_modifier %}
+	{action_respond_info("PURGE: Swapped T%s > T%s" % (from_tool, to_tool))}
+	{% endif %}
+	
+	{% set purge_len = purge_vol / filament_cross_section %}
+	
+	{% set purge_len = purge_len + printer.mmu.extruder_filament_remaining + park_vars.retracted_length + vars.purge_length_addition %}
+	
+	{% else %}
+	{action_respond_info("PURGE: No toolmap or PURGE_LENGTH. Using default")}
+	{% set purge_len = vars.purge_length|float + printer.mmu.extruder_filament_remaining + park_vars.retracted_length %}
+	{% endif %}
+	
+	{% if purge_len < vars.purge_length_minimum %}
+	{action_respond_info("PURGE: Purge length too short, using minimum")}
+	{% endif %}
+	{% set purge_len = [purge_len,vars.purge_length_minimum]|max|round(0, 'ceil')|int %}
+	{action_respond_info("PURGE: Purging %dmm of filament" % (purge_len))}
+	
+	{% if purge_len|float > 0 %}
+	{% if not (printer.toolhead.position.x == vars.purge_x and printer.toolhead.position.y == vars.purge_y) %}
+	PURGE_PARK
+	{% endif%}
+	
+	
+	
+	
+	
+	{% if printer.extruder.temperature < vars.purge_temp_min - 2 %}
+	RESPOND MSG="PURGE: Heating Extruder to MIN"
+	{% if printer.extruder.target < vars.purge_temp_min %}
+	M109 S{vars.purge_temp_min}
+	{% else %}
+	TEMPERATURE_WAIT SENSOR=extruder MINIMUM={vars.purge_temp_min}
+	{% endif %}
+	{% endif %}
+	
+	
+	
+	
+	
+	
+	{% set blobs = (purge_len / vars.purge_length_maximum)|round(0, 'ceil')|int %}
+	{% set purge_per_blob = purge_len|float / blobs %}
+	{% set retracts_per_blob = (purge_per_blob / 40)|round(0, 'ceil')|int %}
+	{% set purge_per_retract = (purge_per_blob / retracts_per_blob)|int %}
+	{% set pulses_per_retract = (purge_per_blob / retracts_per_blob / 5)|round(0, 'ceil')|int %}
+	{% set pulses_per_blob = (purge_per_blob / 5)|round(0, 'ceil')|int %}
+	{% set purge_per_pulse = purge_per_blob / pulses_per_blob %}
+	
+	
+	
+	{% for blob in range(blobs) %}
+	RESPOND MSG={"'PURGE: Blob %d of %d (%.1fmm)'" % (blob + 1, blobs, purge_per_blob)}
+	
+	
+	
+	
+	G91
+	
+	M83
+	
+	
+	
+	
+	{% for pulse in range(pulses_per_blob) %}
+	
+	{% set purged_this_blob = pulse * purge_per_pulse %}
+	{% set speed = vars.purge_spd %}
+	
+	
+	G1 E{purge_per_pulse * 0.95} F{speed}
+	
+	G1 E{purge_per_pulse * 0.05} F{speed}
+	
+	
+	{% if pulse % pulses_per_retract == 0 and pulse > 0 %}
+	G1 E-2 F1800
+	G1 E2 F800
+	{% endif %}
+	{% endfor %}
+	
+	
+	G1 E-{park_vars.retracted_length} F{sequence_vars.retract_speed * 60}
+	
+	
+	
+	
+	
+	
+	G4 P{vars.pressure_release_time}
+	G1 X 30 F500
+	G1 X -30 F500
+	G1 X 30 F1200
+	G1 X -30 F1200
+	
+	
+	{% endfor %}
+	
+	{% endif %}
+	M220 S{(backup_feedrate * 100)|int}
+	{% endif %}
+	G90
+	G1 X125 F15000
+	SET_FAN_SPEED FAN=cooling_fan SPEED={backup_fan_speed}
+	RESTORE_GCODE_STATE NAME=BUCKET_PURGE_state MOVE=0
+	PURGE_WIPE
+
+[gcode_macro PURGE_WIPE]
+gcode = 
+	{% set vars = printer['gcode_macro PURGE_VARIABLES'] %}
+	{% set original_accel = printer.toolhead.max_accel %}
+	{% set original_minimum_cruise_ratio = printer.toolhead.minimum_cruise_ratio %}
+	{% set backup_fan_speed = printer["fan_generic partfan"].speed %}
+	
+	SAVE_GCODE_STATE NAME=PURGE_WIPE_state
+	
+	
+	G90
+	{% if not (printer.toolhead.position.x == vars.purge_x and printer.toolhead.position.y == vars.purge_y) %}
+	PURGE_PARK
+	{% endif%}
+	{% if vars.brush_accel > 0 %}
+	SET_VELOCITY_LIMIT ACCEL={vars.brush_accel} MINIMUM_CRUISE_RATIO=0.1
+	{% endif %}
+	SET_FAN_SPEED FAN=cooling_fan SPEED={vars.wipe_fan_speed}
+	
+	{% set random_y_start = range((vars.brush_Y_position - vars.brush_depth/2)|int, (vars.brush_Y_position + vars.brush_depth/2)|int) | random %}
+	G1 X{vars.brush_start} Y{random_y_start} F{vars.travel_spd_xy}
+	G1 Z -1.50 F900
+	
+	
+	{% for wipes in range(1, (vars.wipe_qty + 1)) %}
+	
+	{% set random_y = range(vars.brush_Y_position|int, (vars.brush_Y_position + vars.brush_depth)|int) | random %}
+	G1 X{vars.brush_start + vars.brush_width} Y{random_y} F{vars.wipe_spd_xy}
+	G1 X{vars.brush_start} F{vars.wipe_spd_xy}
+	
+	
+	{% set center_x = vars.brush_start + vars.brush_width / 2 %}
+	{% set center_y = vars.brush_Y_position + vars.brush_depth / 2 %}
+	{% set radius_x = vars.brush_width / 2 %}
+	{% set radius_y = vars.brush_depth / 2 %}
+	G1 X{center_x + radius_x} Y{center_y} F{vars.wipe_spd_xy / 2}
+	G1 X{center_x} Y{center_y + radius_y} F{vars.wipe_spd_xy / 2}
+	G1 X{center_x - radius_x} Y{center_y} F{vars.wipe_spd_xy / 2}
+	G1 X{center_x} Y{center_y - radius_y} F{vars.wipe_spd_xy / 2}
+	G1 X{center_x + radius_x} Y{center_y} F{vars.wipe_spd_xy / 2}
+	{% endfor %}
+	SET_FAN_SPEED FAN=cooling_fan SPEED={backup_fan_speed}
+	RESTORE_GCODE_STATE NAME=PURGE_WIPE_state
+
+[gcode_macro PURGE_PARK]
+gcode = 
+	{% set Px = printer["gcode_macro PURGE_VARIABLES"].purge_x|float %}
+	{% set Py = printer["gcode_macro PURGE_VARIABLES"].purge_y|float %}
+	{% set Pxe = printer["gcode_macro PURGE_VARIABLES"].purge_x_entry|float %}
+	{% set Pye = printer["gcode_macro PURGE_VARIABLES"].purge_y_entry|float %}
+	{% set St = printer["gcode_macro PURGE_VARIABLES"].travel_speed * 60 %}
+	{% set Se = printer["gcode_macro PURGE_VARIABLES"].entry_speed * 60 %}
+	{% set max_z = printer.configfile.config.stepper_z.position_max|float%}
+	{% set cur_z = printer.gcode_move.gcode_position.z|float %}
+	{% set z_min = printer["gcode_macro PURGE_VARIABLES"].z_min|float %}
+	{% set z_lift = printer["gcode_macro PURGE_VARIABLES"].z_lift|float %}
+	
+	
+	SAVE_GCODE_STATE NAME=PURGE_PARK_state
+	
+	{% if not (printer.toolhead.position.x == Px and printer.toolhead.position.y == Py) %}
+	{% set z_safe = [[cur_z + z_lift, z_min]|max, max_z]|min %}
+	
+	G90
+	G1 Z{z_safe} F{St}
+	G1 X{Pxe} Y{Pye} F{St}
+	G4 P1000
+	G1 X{Px} Y{Py} F{Se}
+	{% endif %}
+	
+	RESTORE_GCODE_STATE NAME=PURGE_PARK_state
+
+[gcode_macro EXIT_PARK]
+gcode = 
+	{% set Px = printer["gcode_macro PURGE_VARIABLES"].purge_x|float %}
+	{% set Py = printer["gcode_macro PURGE_VARIABLES"].purge_y|float %}
+	{% set Pxe = printer["gcode_macro PURGE_VARIABLES"].purge_x_entry|float %}
+	{% set Pye = printer["gcode_macro PURGE_VARIABLES"].purge_y_entry|float %}
+	{% set St = printer["gcode_macro PURGE_VARIABLES"].travel_speed * 60 %}
+	{% set Se = printer["gcode_macro PURGE_VARIABLES"].entry_speed * 60 %}
+	{% set cur_z = printer.gcode_move.gcode_position.z|float %}
+	{% set z_min = printer["gcode_macro PURGE_VARIABLES"].z_min|float %}
+	G90
+	{% if cur_z < z_min %}
+	G1 Z{z_min}
+	{% endif %}
+	{% if not (printer.toolhead.position.x == Px and printer.toolhead.position.y == Py) %}
+	G1 X{Px} Y{Py} F{Se}
+	{% endif %}
+	G1 X{Pxe} Y{Pye} F{Se}
+
+[gcode_macro PURGE]
+gcode = 
+	BUCKET_PURGE
+	EXIT_PARK
+
+[mcu mmu]
+serial = /dev/serial/by-id/usb-Klipper_QIDI_BOX_V2_1.1.3_350058001051353033353536-if00
+
+[board_pins mmu]
+mcu = mmu
+aliases = 
+	MMU_GEAR_UART={gear_uart_pin},
+	MMU_GEAR_STEP=PC14,
+	MMU_GEAR_DIR=PC13,
+	MMU_GEAR_ENABLE=PC15,
+	MMU_GEAR_DIAG={gear_diag_pin},
+	
+	MMU_GEAR_UART_1={gear_1_uart_pin},
+	MMU_GEAR_STEP_1=PB9,
+	MMU_GEAR_DIR_1=PB8,
+	MMU_GEAR_ENABLE_1=PC0,
+	MMU_GEAR_DIAG_1={gear_1_diag_pin},
+	
+	MMU_GEAR_UART_2={gear_2_uart_pin},
+	MMU_GEAR_STEP_2=PC12,
+	MMU_GEAR_DIR_2=PC11,
+	MMU_GEAR_ENABLE_2=PD2,
+	MMU_GEAR_DIAG_2={gear_2_diag_pin},
+	
+	MMU_GEAR_UART_3={gear_3_uart_pin},
+	MMU_GEAR_STEP_3=PC8,
+	MMU_GEAR_DIR_3=PB2,
+	MMU_GEAR_ENABLE_3=PC10,
+	MMU_GEAR_DIAG_3={gear_3_diag_pin},
+	
+	MMU_SEL_UART={selector_uart_pin},
+	MMU_SEL_STEP={selector_step_pin},
+	MMU_SEL_DIR={selector_dir_pin},
+	MMU_SEL_ENABLE={selector_enable_pin},
+	MMU_SEL_DIAG={selector_diag_pin},
+	MMU_SEL_ENDSTOP={selector_endstop_pin},
+	MMU_SEL_SERVO={selector_servo_pin},
+	
+	MMU_ENCODER={encoder_pin},
+	MMU_GATE_SENSOR=PB1,
+	MMU_NEOPIXEL={neopixel_pin},
+	
+	MMU_PRE_GATE_0=PA0,
+	MMU_PRE_GATE_1=PB3,
+	MMU_PRE_GATE_2=PA13,
+	MMU_PRE_GATE_3=PA7,
+	MMU_PRE_GATE_4={pre_gate_4_pin},
+	MMU_PRE_GATE_5={pre_gate_5_pin},
+	MMU_PRE_GATE_6={pre_gate_6_pin},
+	MMU_PRE_GATE_7={pre_gate_7_pin},
+	MMU_PRE_GATE_8={pre_gate_8_pin},
+	MMU_PRE_GATE_9={pre_gate_9_pin},
+	MMU_PRE_GATE_10={pre_gate_10_pin},
+	MMU_PRE_GATE_11={pre_gate_11_pin},
+	
+	MMU_POST_GEAR_0={gear_sensor_0_pin},
+	MMU_POST_GEAR_1={gear_sensor_1_pin},
+	MMU_POST_GEAR_2={gear_sensor_2_pin},
+	MMU_POST_GEAR_3={gear_sensor_3_pin},
+	MMU_POST_GEAR_4={gear_sensor_4_pin},
+	MMU_POST_GEAR_5={gear_sensor_5_pin},
+	MMU_POST_GEAR_6={gear_sensor_6_pin},
+	MMU_POST_GEAR_7={gear_sensor_7_pin},
+	MMU_POST_GEAR_8={gear_sensor_8_pin},
+	MMU_POST_GEAR_9={gear_sensor_9_pin},
+	MMU_POST_GEAR_10={gear_sensor_10_pin},
+	MMU_POST_GEAR_11={gear_sensor_11_pin},
+	
+	MMU_ESPOOLER_RWD_0={espooler_rwd_0_pin},
+	MMU_ESPOOLER_FWD_0={espooler_fwd_0_pin},
+	MMU_ESPOOLER_EN_0={espooler_en_0_pin},
+	MMU_ESPOOLER_TRIG_0=,
+	MMU_ESPOOLER_RWD_1={espooler_rwd_1_pin},
+	MMU_ESPOOLER_FWD_1={espooler_fwd_1_pin},
+	MMU_ESPOOLER_EN_1={espooler_en_1_pin},
+	MMU_ESPOOLER_TRIG_1=,
+	MMU_ESPOOLER_RWD_2={espooler_rwd_2_pin},
+	MMU_ESPOOLER_FWD_2={espooler_fwd_2_pin},
+	MMU_ESPOOLER_EN_2={espooler_en_2_pin},
+	MMU_ESPOOLER_TRIG_2=,
+	MMU_ESPOOLER_RWD_3={espooler_rwd_3_pin},
+	MMU_ESPOOLER_FWD_3={espooler_fwd_3_pin},
+	MMU_ESPOOLER_EN_3={espooler_en_3_pin},
+	MMU_ESPOOLER_TRIG_3=,
+
+[gcode_macro _MMU_CUT_TIP]
+description = Cut filament by pressing the cutter on a pin with a horizontal movement
+variable_output_park_pos = 0
+gcode = 
+	{% set final_eject = params.FINAL_EJECT|default(0)|int %}
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set pin_loc_x, pin_loc_y = vars.pin_loc_xy|map('float') %}
+	{% set pin_park_dist = vars['pin_park_dist']|float %}
+	{% set retract_length = vars['retract_length']|float %}
+	{% set simple_tip_forming = vars['simple_tip_forming']|default(true)|lower == 'true' %}
+	{% set blade_pos = vars['blade_pos']|float %}
+	{% set rip_length = vars['rip_length']|float %}
+	{% set pushback_length = vars['pushback_length']|float %}
+	{% set pushback_dwell_time = vars['pushback_dwell_time']|int %}
+	{% set extruder_move_speed = vars['extruder_move_speed']|float %}
+	{% set travel_speed = vars['travel_speed']|float %}
+	{% set restore_position = vars['restore_position']|default(true)|lower == 'true' %}
+	{% set extruder_park_pos = blade_pos + rip_length %}
+	{% set cutting_axis = vars['cutting_axis'] %}
+	
+	{% if cutting_axis == "x" %}
+	{% set pin_park_x_loc = pin_loc_x + pin_park_dist %}
+	{% set pin_park_y_loc = pin_loc_y %}
+	{% else %}
+	{% set pin_park_y_loc = pin_loc_y + pin_park_dist %}
+	{% set pin_park_x_loc = pin_loc_x %}
+	{% endif %}
+	
+	{% if "xy" not in printer.toolhead.homed_axes %}
+	MMU_LOG MSG="Automatically homing XY"
+	G28 X Y
+	_CUT_TIP_MOVE_IN_BOUNDS
+	{% endif %}
+	
+	SAVE_GCODE_STATE NAME=_MMU_CUT_TIP_state
+	
+	G90
+	M83
+	G92 E0
+	
+	
+	{% set effective_retract_length = retract_length - printer.mmu.extruder_filament_remaining - park_vars.retracted_length %}
+	{% if effective_retract_length > 0 %}
+	MMU_LOG MSG="Retracting filament {effective_retract_length|round(1)}mm prior to cut"
+	G1 E-{effective_retract_length} F{extruder_move_speed * 60}
+	{% if simple_tip_forming %}
+	G1 E{effective_retract_length / 2} F{extruder_move_speed * 60}
+	G1 E-{effective_retract_length / 2} F{extruder_move_speed * 60}
+	{% endif %}
+	{% endif %}
+	
+	
+	_CUT_TIP_ADJUST_CURRENT
+	_CUT_TIP_MOVE_TO_CUTTER_PIN PIN_PARK_X_LOC={pin_park_x_loc} PIN_PARK_Y_LOC={pin_park_y_loc}
+	_CUT_TIP_GANTRY_SERVO_DOWN
+	_CUT_TIP_DO_CUT_MOTION PIN_PARK_X_LOC={pin_park_x_loc} PIN_PARK_Y_LOC={pin_park_y_loc} RIP_LENGTH={rip_length}
+	_CUT_TIP_GANTRY_SERVO_UP
+	_CUT_TIP_RESTORE_CURRENT
+	_MMU_EVENT EVENT="filament_cut"
+	
+	
+	{% set effective_pushback_length = [pushback_length, retract_length - printer.mmu.extruder_filament_remaining - park_vars.retracted_length]|min %}
+	{% if effective_pushback_length > 0 %}
+	MMU_LOG MSG="Pushing filament fragment back {effective_pushback_length|round(1)}mm after cut"
+	G1 E{effective_pushback_length} F{extruder_move_speed * 60}
+	G4 P{pushback_dwell_time}
+	G1 E-{effective_pushback_length} F{extruder_move_speed * 60}
+	{% endif %}
+	
+	
+	{% if final_eject %}
+	G92 E0
+	G1 E-80 F{extruder_move_speed * 60}
+	{% endif %}
+	
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_CUT_TIP VARIABLE=output_park_pos VALUE={extruder_park_pos}
+	
+	
+	RESTORE_GCODE_STATE NAME=_MMU_CUT_TIP_state MOVE={1 if restore_position else 0} MOVE_SPEED={travel_speed}
+
+[gcode_macro _CUT_TIP_ADJUST_CURRENT]
+description = Helper to optionally increase X/Y stepper current prior to cut
+variable_current_map = {}
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set cut_axis_steppers = (vars['cut_axis_steppers'] | default('')).split(',') | map('trim') | list %}
+	{% set cut_stepper_current = vars['cut_stepper_current'] | default(100) | int %}
+	{% set tmc_types = ["tmc2209", "tmc2130", "tmc2208", "tmc2660", "tmc5160", "tmc2240"] %}
+	
+	{% if not current_map %}
+	{% set ns = namespace(run_current={}) %}
+	{% if cut_stepper_current != 100 %}
+	{% for stepper in cut_axis_steppers %}
+	{% for tmc in tmc_types %}
+	{% set fullname = tmc ~ ' ' ~ stepper %}
+	{% if printer[fullname] is defined %}
+	
+	{% set cur_rc = printer[fullname].run_current %}
+	{% if ns.run_current.update({stepper: cur_rc}) %}{% endif %}
+	{% set new_rc = cur_rc * cut_stepper_current | float / 100 %}
+	MMU_LOG MSG="Adjusting {stepper} current"
+	SET_TMC_CURRENT STEPPER={stepper} CURRENT={new_rc}
+	{% endif %}
+	{% endfor %}
+	{% endfor %}
+	{% endif %}
+	
+	SET_GCODE_VARIABLE MACRO=_CUT_TIP_ADJUST_CURRENT VARIABLE=current_map VALUE="{ns.run_current}"
+	{% endif %}
+
+[gcode_macro _CUT_TIP_RESTORE_CURRENT]
+description = Helper to restore X/Y stepper current after cutting action
+gcode = 
+	{% set current_vars = printer['gcode_macro _CUT_TIP_ADJUST_CURRENT'] %}
+	{% set current_map = current_vars['current_map'] %}
+	
+	{% if current_map %}
+	{% for stepper, current in current_map.items() %}
+	MMU_LOG MSG="Restoring {stepper} current"
+	SET_TMC_CURRENT STEPPER={stepper} CURRENT={current}
+	{% endfor %}
+	{% endif %}
+	
+	SET_GCODE_VARIABLE MACRO=_CUT_TIP_ADJUST_CURRENT VARIABLE=current_map VALUE="{{}}"
+
+[gcode_macro _CUT_TIP_MOVE_IN_BOUNDS]
+description = Helper to move the toolhead to a legal position after homing
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set travel_speed = vars['travel_speed']|float %}
+	
+	{% set pos = printer.gcode_move.gcode_position %}
+	{% set axis_minimum = printer.toolhead.axis_minimum %}
+	{% set axis_maximum = printer.toolhead.axis_maximum %}
+	{% set x = [axis_minimum.x, [axis_maximum.x, pos.x]|min]|max %}
+	{% set y = [axis_minimum.y, [axis_maximum.y, pos.y]|min]|max %}
+	
+	MMU_LOG MSG="Warning: Klipper reported out of range gcode position (x:{pos.x}, y:{pos.y})! Adjusted to (x:{x}, y:{y}) to prevent move failure" ERROR=1
+	G1 X{x} Y{y} F{travel_speed * 60}
+
+[gcode_macro _CUT_TIP_MOVE_TO_CUTTER_PIN]
+description = Helper to move the toolhead to the target pin in either safe or faster way, depending on toolhead clearance
+gcode = 
+	{% set pin_park_x_loc = params.PIN_PARK_X_LOC|float %}
+	{% set pin_park_y_loc = params.PIN_PARK_Y_LOC|float %}
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	
+	{% set safe_margin_x, safe_margin_y = vars.safe_margin_xy|map('float') %}
+	{% set travel_speed = vars['travel_speed']|float %}
+	{% set cutting_axis = vars['cutting_axis'] %}
+	
+	{% if ((printer.gcode_move.gcode_position.x - pin_park_x_loc)|abs < safe_margin_x) or ((printer.gcode_move.gcode_position.y - pin_park_y_loc)|abs < safe_margin_y) %}
+	
+	{% if cutting_axis == "x" %}
+	G1 X{pin_park_x_loc} F{travel_speed * 60}
+	G1 Y{pin_park_y_loc} F{travel_speed * 60}
+	{% else %}
+	G1 Y{pin_park_y_loc} F{travel_speed * 60}
+	G1 X{pin_park_x_loc} F{travel_speed * 60}
+	{% endif %}
+	{% else %}
+	G1 X{pin_park_x_loc} Y{pin_park_y_loc} F{travel_speed * 60}
+	{% endif %}
+
+[gcode_macro _CUT_TIP_DO_CUT_MOTION]
+description = Helper to do a single cut movement
+gcode = 
+	{% set pin_park_x_loc = params.PIN_PARK_X_LOC | float %}
+	{% set pin_park_y_loc = params.PIN_PARK_Y_LOC | float %}
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set cutting_axis = vars['cutting_axis'] %}
+	
+	{% set pin_loc = vars['pin_loc_compressed']|default(-999)|float %}
+	{% if pin_loc != -999 %}
+	
+	{% if cutting_axis == "x" %}
+	{% set pin_loc_compressed_x = pin_loc %}
+	{% set pin_loc_compressed_y = pin_park_y_loc %}
+	{% else %}
+	{% set pin_loc_compressed_x = pin_park_x_loc %}
+	{% set pin_loc_compressed_y = pin_loc %}
+	{% endif %}
+	{% else %}
+	
+	{% set pin_loc_compressed_x, pin_loc_compressed_y = vars.pin_loc_compressed_xy|map('float') %}
+	{% endif %}
+	
+	{% set cut_fast_move_fraction = vars['cut_fast_move_fraction']|float %}
+	{% set cut_fast_move_speed = vars['cut_fast_move_speed']|float %}
+	{% set cut_slow_move_speed = vars['cut_slow_move_speed']|float %}
+	{% set cut_dwell_time = vars['cut_dwell_time']|float %}
+	{% set evacuate_speed = vars['evacuate_speed']|float %}
+	{% set rip_length = vars['rip_length']|float %}
+	{% set rip_speed = vars['rip_speed']|float %}
+	
+	
+	{% set fast_slow_transition_loc_x = (pin_loc_compressed_x - pin_park_x_loc) * cut_fast_move_fraction + pin_park_x_loc|float %}
+	{% set fast_slow_transition_loc_y = (pin_loc_compressed_y - pin_park_y_loc) * cut_fast_move_fraction + pin_park_y_loc|float %}
+	G1 X{fast_slow_transition_loc_x} Y{fast_slow_transition_loc_y} F{cut_fast_move_speed * 60}
+	G1 X{pin_loc_compressed_x} Y{pin_loc_compressed_y} F{cut_slow_move_speed * 60}
+	
+	G4 P{cut_dwell_time}
+	{% if rip_length > 0 %}
+	G1 E-{rip_length} F{rip_speed * 60}
+	{% endif %}
+	
+	G1 X{pin_park_x_loc} Y{pin_park_y_loc} F{evacuate_speed * 60}
+
+[gcode_macro _CUT_TIP_GANTRY_SERVO_DOWN]
+description = Operate optional gantry servo operated pin
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set gantry_servo_enabled = vars['gantry_servo_enabled']|default(true)|lower == 'true' %}
+	{% set angle = vars['gantry_servo_down_angle']|float %}
+	
+	{% if gantry_servo_enabled %}
+	SET_SERVO SERVO=mmu_gantry_servo ANGLE={angle}
+	G4 P500
+	{% endif %}
+
+[gcode_macro _CUT_TIP_GANTRY_SERVO_UP]
+description = Operate optional gantry servo operated pin
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_CUT_TIP_VARS'] %}
+	{% set gantry_servo_enabled = vars['gantry_servo_enabled']|default(true)|lower == 'true' %}
+	{% set angle = vars['gantry_servo_up_angle']|float %}
+	
+	{% if gantry_servo_enabled %}
+	SET_SERVO SERVO=mmu_gantry_servo ANGLE={angle} DURATION=0.5
+	{% endif %}
+
+[gcode_macro _MMU_FORM_TIP]
+description = Standalone macro that mimics Superslicer process
+gcode = 
+	{% set final_eject = params.FINAL_EJECT|default(0)|int %}
+	{% set vars = printer['gcode_macro _MMU_FORM_TIP_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set unloading_speed_start = vars['unloading_speed_start']|int %}
+	{% set unloading_speed = vars['unloading_speed']|int %}
+	{% set ramming_volume = vars['ramming_volume']|float %}
+	{% set ramming_volume_standalone = vars['ramming_volume_standalone']|float %}
+	{% set cooling_tube_length = vars['cooling_tube_length']|float %}
+	{% set cooling_tube_position = vars['cooling_tube_position']|float %}
+	{% set initial_cooling_speed = vars['initial_cooling_speed']|int %}
+	{% set final_cooling_speed = vars['final_cooling_speed']|int %}
+	{% set cooling_moves = vars['cooling_moves']|int %}
+	{% set toolchange_temp = vars['toolchange_temp']|default(0)|int %}
+	{% set use_skinnydip = vars['use_skinnydip']|default(false)|lower == 'true' %}
+	{% set use_fast_skinnydip = vars['use_fast_skinnydip']|default(false)|lower == 'true' %}
+	{% set skinnydip_distance = vars['skinnydip_distance']|float %}
+	{% set dip_insertion_speed = vars['dip_insertion_speed']|int %}
+	{% set dip_extraction_speed = vars['dip_extraction_speed']|int %}
+	{% set melt_zone_pause = vars['melt_zone_pause']|default(0)|int %}
+	{% set cooling_zone_pause = vars['cooling_zone_pause']|default(0)|int %}
+	{% set extruder_eject_speed = vars['extruder_eject_speed']|int %}
+	{% set parking_distance = vars['parking_distance']|default(0)|float %}
+	{% set orig_temp = printer.extruder.target %}
+	{% set next_temp = params.NEXT_TEMP|default(orig_temp)|int %}
+	
+	
+	{% set runout = printer.mmu.runout %}
+	{% set printing = printer.mmu.print_state == 'printing' %}
+	
+	SAVE_GCODE_STATE NAME=MMU_FORM_TIP_state
+	
+	G91
+	M83
+	G92 E0
+	
+	
+	
+	{% set ramming_volume = ramming_volume_standalone if not printing else ramming_volume %}
+	{% if ramming_volume > 0 %}
+	{% set ratio = ramming_volume / 23.0 %}
+	G1 E{0.5784 * ratio} F299
+	G1 E{0.5834 * ratio} F302
+	G1 E{0.5918 * ratio} F306
+	G1 E{0.6169 * ratio} F319
+	G1 E{0.3393 * ratio} F350
+	G1 E{0.3363 * ratio} F350
+	G1 E{0.7577 * ratio} F392
+	G1 E{0.8382 * ratio} F434
+	G1 E{0.7776 * ratio} F469
+	G1 E{0.1293 * ratio} F469
+	G1 E{0.9673 * ratio} F501
+	G1 E{1.0176 * ratio} F527
+	G1 E{0.5956 * ratio} F544
+	G1 E{0.4555 * ratio} F544
+	G1 E{1.0662 * ratio} F552
+	{% endif %}
+	
+	
+	
+	{% set total_retraction_distance = cooling_tube_position - printer.mmu.extruder_filament_remaining - park_vars.retracted_length + cooling_tube_length - 15 %}
+	G1 E-15 F{1.0 * unloading_speed_start * 60}
+	{% if total_retraction_distance > 0 %}
+	G1 E-{(0.7 * total_retraction_distance)|round(2)} F{1.0 * unloading_speed * 60}
+	G1 E-{(0.2 * total_retraction_distance)|round(2)} F{0.5 * unloading_speed * 60}
+	G1 E-{(0.1 * total_retraction_distance)|round(2)} F{0.3 * unloading_speed * 60}
+	{% endif %}
+	
+	
+	{% if toolchange_temp > 0 %}
+	M104 S{toolchange_temp}
+	{% if not use_fast_skinnydip %}
+	_WAIT_FOR_TEMP
+	{% endif %}
+	{% endif %}
+	
+	
+	
+	{% set speed_inc = (final_cooling_speed - initial_cooling_speed) / (2 * cooling_moves - 1) %}
+	{% for move in range(cooling_moves) %}
+	{% set speed = initial_cooling_speed + speed_inc * move * 2 %}
+	G1 E{cooling_tube_length} F{speed * 60}
+	G1 E-{cooling_tube_length} F{(speed + speed_inc) * 60}
+	{% endfor %}
+	
+	
+	{% if toolchange_temp > 0 and use_skinnydip and use_fast_skinnydip %}
+	_WAIT_FOR_TEMP
+	{% endif %}
+	
+	
+	
+	{% if use_skinnydip %}
+	G1 E{skinnydip_distance} F{dip_insertion_speed * 60}
+	G4 P{melt_zone_pause}
+	G1 E-{skinnydip_distance} F{dip_extraction_speed * 60}
+	G4 P{cooling_zone_pause}
+	{% endif %}
+	
+	
+	
+	M104 S{next_temp}
+	
+	
+	
+	{% if final_eject %}
+	G92 E0
+	G1 E-80 F{extruder_eject_speed * 60}
+	{% elif parking_distance > 0 %}
+	G90
+	M82
+	G1 E-{parking_distance} F{extruder_eject_speed * 60}
+	{% endif %}
+	
+	
+	RESTORE_GCODE_STATE NAME=MMU_FORM_TIP_state
+
+[gcode_macro _WAIT_FOR_TEMP]
+description = Helper function for fan assisted extruder temp reduction
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_FORM_TIP_VARS'] %}
+	{% set toolchange_temp = vars['toolchange_temp']|default(0)|int %}
+	{% set toolchange_use_fan = vars['toolchange_fan_assist']|default(false)|lower == 'true' %}
+	{% set toolchange_fan_speed = vars['toolchange_fan_speed']|default(50)|int %}
+	{% set toolchange_fan = vars['toolchange_fan_name']|default('')|string %}
+	
+	MMU_LOG MSG='{"Waiting for extruder temp %d\u00B0C..." % toolchange_temp}'
+	{% if toolchange_use_fan %}
+	{% if printer.fan is defined or printer[toolchange_fan] is defined %}
+	{% set orig_fan_speed = printer[toolchange_fan].speed if printer[toolchange_fan] is defined else printer.fan.speed %}
+	M106 S{(toolchange_fan_speed / 100 * 255)|int}
+	M109 S{toolchange_temp}
+	M106 S{(orig_fan_speed * 255)|int}
+	{% else %}
+	MMU_LOG MSG="Warning: Printer part fan is not defined. Ignoring 'toolchange_use_fan' option" ERROR=1
+	M109 S{toolchange_temp}
+	{% endif %}
+	{% else %}
+	M109 S{toolchange_temp}
+	{% endif %}
+
+[mmu_machine]
+num_gates = 4
+mmu_vendor = Other
+mmu_version = 1.0
+selector_type = VirtualSelector
+variable_bowden_lengths = 0
+variable_rotation_distances = 0
+require_bowden_move = 1
+filament_always_gripped = 1
+environment_sensor = 
+homing_extruder = 1
+
+[stepper_mmu_gear]
+step_pin = mmu:MMU_GEAR_STEP
+dir_pin = mmu:MMU_GEAR_DIR
+enable_pin = !mmu:MMU_GEAR_ENABLE
+rotation_distance = 13.6
+gear_ratio = 1:1
+microsteps = 16
+full_steps_per_rotation = 200
+
+[stepper_mmu_gear_1]
+step_pin = mmu:MMU_GEAR_STEP_1
+dir_pin = mmu:MMU_GEAR_DIR_1
+enable_pin = !mmu:MMU_GEAR_ENABLE_1
+
+[stepper_mmu_gear_2]
+step_pin = mmu:MMU_GEAR_STEP_2
+dir_pin = mmu:MMU_GEAR_DIR_2
+enable_pin = !mmu:MMU_GEAR_ENABLE_2
+
+[stepper_mmu_gear_3]
+step_pin = mmu:MMU_GEAR_STEP_3
+dir_pin = mmu:MMU_GEAR_DIR_3
+enable_pin = !mmu:MMU_GEAR_ENABLE_3
+
+[mmu_sensors]
+pre_gate_switch_pin_0 = !mmu:MMU_PRE_GATE_0
+pre_gate_switch_pin_1 = !mmu:MMU_PRE_GATE_1
+pre_gate_switch_pin_2 = !mmu:MMU_PRE_GATE_2
+pre_gate_switch_pin_3 = !mmu:MMU_PRE_GATE_3
+pre_gate_switch_pin_4 = ^mmu:MMU_PRE_GATE_4
+pre_gate_switch_pin_5 = ^mmu:MMU_PRE_GATE_5
+pre_gate_switch_pin_6 = ^mmu:MMU_PRE_GATE_6
+pre_gate_switch_pin_7 = ^mmu:MMU_PRE_GATE_7
+pre_gate_switch_pin_8 = ^mmu:MMU_PRE_GATE_8
+pre_gate_switch_pin_9 = ^mmu:MMU_PRE_GATE_9
+pre_gate_switch_pin_10 = ^mmu:MMU_PRE_GATE_10
+pre_gate_switch_pin_11 = ^mmu:MMU_PRE_GATE_11
+post_gear_switch_pin_0 = ^mmu:MMU_POST_GEAR_0
+post_gear_switch_pin_1 = ^mmu:MMU_POST_GEAR_1
+post_gear_switch_pin_2 = ^mmu:MMU_POST_GEAR_2
+post_gear_switch_pin_3 = ^mmu:MMU_POST_GEAR_3
+post_gear_switch_pin_4 = ^mmu:MMU_POST_GEAR_4
+post_gear_switch_pin_5 = ^mmu:MMU_POST_GEAR_5
+post_gear_switch_pin_6 = ^mmu:MMU_POST_GEAR_6
+post_gear_switch_pin_7 = ^mmu:MMU_POST_GEAR_7
+post_gear_switch_pin_8 = ^mmu:MMU_POST_GEAR_8
+post_gear_switch_pin_9 = ^mmu:MMU_POST_GEAR_9
+post_gear_switch_pin_10 = ^mmu:MMU_POST_GEAR_10
+post_gear_switch_pin_11 = ^mmu:MMU_POST_GEAR_11
+gate_switch_pin = ^!mmu:MMU_GATE_SENSOR
+sync_feedback_tension_pin = 
+sync_feedback_compression_pin = 
+extruder_switch_pin = !THR:PA1
+toolhead_switch_pin = 
+
+[mmu_led_effect mmu_breathing_red]
+layers = breathing 4 0 top (1,0,0)
+
+[mmu_led_effect mmu_white_slow]
+define_on = exit, status
+layers = breathing 1.0 0 top (0.8,0.8,0.8)
+
+[mmu_led_effect mmu_white_fast]
+define_on = exit, status
+layers = breathing 0.6 0 top (0.2,0.2,0.2)
+
+[mmu_led_effect mmu_blue_clockwise_slow]
+define_on = gates, status
+layers = chase .5 .5 top (0,0,1), (0,0,.4)
+
+[mmu_led_effect mmu_blue_clockwise_fast]
+define_on = gates, status
+layers = chase 1 .5 top (0,0,1), (0,0,.4)
+
+[mmu_led_effect mmu_blue_anticlock_slow]
+define_on = gates, status
+layers = chase -.5 .5 top (0,0,1), (0,0,.4)
+
+[mmu_led_effect mmu_blue_anticlock_fast]
+define_on = gates, status
+layers = chase -1 .5 top (0,0,1), (0,0,.4)
+
+[mmu_led_effect mmu_strobe]
+layers = strobe    1 1.5 add (1,1,1)
+	breathing 2 0   difference (0.95,0,0)
+	static    0 0   top (1,0,0)
+
+[mmu_led_effect mmu_static_green]
+define_on = gates
+layers = static 0 0 top (0,0.5,0)
+
+[mmu_led_effect mmu_ready_green]
+define_on = gates
+layers = breathing 2 0 subtract (0,0.35,0)
+	static 0 0 top (0,0.5,0)
+
+[mmu_led_effect mmu_static_orange]
+define_on = gates
+layers = static 0 0 top (0.5,0.2,0)
+
+[mmu_led_effect mmu_ready_orange]
+define_on = gates
+layers = breathing 2 0 subtract (0.35,0.14,0)
+	static 0 0 top (0.5,0.2,0)
+
+[mmu_led_effect mmu_ready_orange2]
+define_on = gates
+layers = breathing 2 0 top (0.175,0.07,0)
+
+[mmu_led_effect mmu_static_blue]
+define_on = gates
+layers = static 0 0 top (0,0,1)
+
+[mmu_led_effect mmu_ready_blue]
+define_on = gates
+layers = breathing 2 0 add (0,0,0.5)
+	static 0 0 top (0,0,0)
+
+[mmu_led_effect mmu_static_black]
+define_on = gates
+layers = static 0 0 top (0,0,0)
+
+[mmu_led_effect mmu_rainbow]
+define_on = entry, exit, status
+layers = gradient  0.8  0.5 add (0.3, 0.0, 0.0), (0.0, 0.3, 0.0), (0.0, 0.0, 0.3)
+
+[mmu_led_effect mmu_sparkle]
+define_on = exit
+layers = twinkle 8 0.15 top (0.3,0.3,0.3), (0.4,0,0.25)
+
+[save_variables]
+filename = /home/mks/printer_data/config/saved_variables.cfg
+
+[extruder]
+max_extrude_only_distance = 1000.0
+max_extrude_cross_section = 500
+step_pin = TH:PB9
+dir_pin = !TH:PB8
+enable_pin = !TH:PC15
+rotation_distance = 53.7
+gear_ratio = 1517:170
+microsteps = 16
+full_steps_per_rotation = 200
+nozzle_diameter = 0.400
+filament_diameter = 1.75
+min_temp = 0
+max_temp = 375
+min_extrude_temp = 175
+smooth_time = 0.000001
+heater_pin = TH:PB15
+sensor_type = MAX6675
+sensor_pin = TH:PB12
+spi_bus = spi2
+spi_speed = 2000000
+max_power = 1
+control = pid
+pid_kp = 33.555
+pid_ki = 4.76
+pid_kd = 59.141
+pressure_advance = 0.032
+pressure_advance_smooth_time = 0.03
+instantaneous_corner_velocity = 10.000
+max_extrude_only_velocity = 5000
+max_extrude_only_accel = 5000
+
+[respond]
+
+[display_status]
+
+[pause_resume]
+
+[virtual_sdcard]
+path = ~/printer_data/gcodes
+
+[gcode_macro _MMU_SOFTWARE_VARS]
+description = Happy Hare optional configuration for print start/end checks
+gcode = 
+variable_user_pre_initialize_extension = ''
+variable_home_mmu = False
+variable_check_gates = True
+variable_load_initial_tool = True
+variable_automap_strategy = "none"
+variable_user_print_end_extension = ''
+variable_unload_tool = True
+variable_reset_ttg = False
+variable_dump_stats = True
+
+[gcode_macro _MMU_STATE_VARS]
+description = Happy Hare configuration for state change hooks
+gcode = 
+variable_user_action_changed_extension = ''
+variable_user_print_state_changed_extension = ''
+variable_user_mmu_event_extension = ''
+variable_servo_down_limit = 5000
+variable_cutter_blade_limit = 3000
+
+[gcode_macro _MMU_SEQUENCE_VARS]
+description = Happy Hare sequence macro configuration variables
+gcode = 
+variable_enable_park_printing = 'toolchange,runout,load,unload,complete,pause,cancel'
+variable_enable_park_standalone = 'toolchange,load,unload,pause,cancel'
+variable_enable_park_disabled = 'pause,cancel'
+variable_min_toolchange_z = 1.0
+variable_park_toolchange = -999, -999, 1,  5, 2
+variable_park_runout = -999, -999, 1,  5, 2
+variable_park_pause = 50,   50,   5,  0, 2
+variable_park_cancel = -999, -999, 10, 0, 5
+variable_park_complete = 50,   50,   10, 0, 5
+variable_pre_unload_position = -999, -999, 0
+variable_post_form_tip_position = -999, -999, 0
+variable_pre_load_position = -999, -999, 0
+variable_restore_xy_pos = "last"
+variable_park_travel_speed = 200
+variable_park_lift_speed = 15
+variable_retract_speed = 30
+variable_unretract_speed = 30
+variable_user_park_move_macro = 'PURGE_PARK'
+variable_auto_home = True
+variable_timelapse = False
+variable_user_mmu_error_extension = ''
+variable_user_pre_unload_extension = ''
+variable_user_post_form_tip_extension = ''
+variable_user_post_unload_extension = ''
+variable_user_pre_load_extension = 'PURGE_PARK'
+variable_user_post_load_extension = 'BUCKET_PURGE'
+
+[gcode_macro _MMU_CUT_TIP_VARS]
+description = Happy Hare toolhead tip cutting macro configuration variables
+gcode = 
+variable_restore_position = False
+variable_blade_pos = 52
+variable_retract_length = 10
+variable_simple_tip_forming = True
+variable_cut_axis_steppers = 'stepper_x, stepper_y'
+variable_cut_stepper_current = 100
+variable_cutting_axis = "x"
+variable_pin_loc_xy = 11, 0.5
+variable_pin_park_dist = 11.5
+variable_pin_loc_compressed_xy = -0.5, 0.5
+variable_rip_length = 1.0
+variable_rip_speed = 3
+variable_pushback_length = 3.0
+variable_pushback_dwell_time = 0
+variable_travel_speed = 150
+variable_cut_fast_move_speed = 32
+variable_cut_slow_move_speed = 8
+variable_evacuate_speed = 150
+variable_cut_dwell_time = 50
+variable_cut_fast_move_fraction = 1.0
+variable_extruder_move_speed = 25
+variable_safe_margin_xy = 60, 60
+variable_gantry_servo_enabled = False
+variable_gantry_servo_down_angle = 55
+variable_gantry_servo_up_angle = 180
+
+[gcode_macro _MMU_FORM_TIP_VARS]
+description = Happy Hare tip forming macro configuration variables
+gcode = 
+variable_ramming_volume = 0
+variable_ramming_volume_standalone = 0
+variable_toolchange_temp = 0
+variable_toolchange_fan_assist = False
+variable_toolchange_fan_name = 'fan_generic cooling_fan'
+variable_toolchange_fan_speed = 50
+variable_unloading_speed_start = 80
+variable_unloading_speed = 18
+variable_cooling_tube_position = 20
+variable_cooling_tube_length = 22
+variable_initial_cooling_speed = 10
+variable_final_cooling_speed = 50
+variable_cooling_moves = 4
+variable_use_skinnydip = False
+variable_skinnydip_distance = 30
+variable_dip_insertion_speed = 30
+variable_dip_extraction_speed = 70
+variable_melt_zone_pause = 0
+variable_cooling_zone_pause = 0
+variable_use_fast_skinnydip = False
+variable_parking_distance = 0
+variable_extruder_eject_speed = 25
+
+[gcode_macro _MMU_PURGE_VARS]
+description = Happy Hare reference purging macro configuration variables
+gcode = 
+variable_extruder_purge_speed = 2
+
+[gcode_macro _MMU_CLIENT_VARS]
+description = Happy Hare client macro configuration variables
+gcode = 
+variable_reset_ttg_on_cancel = False
+variable_unload_tool_on_cancel = False
+variable_user_pause_extension = ''
+variable_user_resume_extension = ''
+variable_user_cancel_extension = ''
+
+[gcode_macro T0]
+gcode = MMU_CHANGE_TOOL TOOL=0
+
+[gcode_macro T1]
+gcode = MMU_CHANGE_TOOL TOOL=1
+
+[gcode_macro T2]
+gcode = MMU_CHANGE_TOOL TOOL=2
+
+[gcode_macro T3]
+gcode = MMU_CHANGE_TOOL TOOL=3
+
+[mmu]
+happy_hare_version = 3.41
+gear_max_velocity = 300
+gear_max_accel = 1500
+log_level = 1
+log_file_level = 2
+log_statistics = 1
+log_visual = 1
+log_startup_status = 1
+log_m117_messages = 1
+gear_from_spool_speed = 80
+gear_from_spool_accel = 100
+gear_from_buffer_speed = 150
+gear_from_buffer_accel = 400
+gear_unload_speed = 80
+gear_unload_accel = 100
+gear_short_move_speed = 80
+gear_short_move_accel = 600
+gear_short_move_threshold = 70
+gear_homing_speed = 50
+extruder_load_speed = 16
+extruder_unload_speed = 16
+extruder_sync_load_speed = 18
+extruder_sync_unload_speed = 18
+extruder_homing_speed = 18
+macro_toolhead_max_accel = 0
+macro_toolhead_min_cruise_ratio = 0.5
+gate_homing_endstop = mmu_gate
+gate_homing_max = 70
+gate_preload_homing_max = 70
+gate_preload_parking_distance = -10
+gate_unload_buffer = 50
+gate_parking_distance = 100
+gate_endstop_to_encoder = 10
+gate_autoload = 1
+gate_final_eject_distance = 0
+bowden_homing_max = 2000
+bowden_apply_correction = 0
+bowden_allowable_load_delta = 20.0
+bowden_pre_unload_test = 1
+bowden_pre_unload_error_tolerance = 50
+extruder_homing_max = 80
+extruder_homing_endstop = none
+extruder_homing_buffer = 25
+extruder_collision_homing_current = 30
+extruder_force_homing = 0
+toolhead_homing_max = 40
+toolhead_extruder_to_nozzle = 75
+toolhead_sensor_to_nozzle = 62
+toolhead_entry_to_extruder = 22
+toolhead_residual_filament = 0
+toolhead_ooze_reduction = 0
+toolhead_unload_safety_margin = 10
+toolhead_post_load_tighten = 60
+toolhead_post_load_tension_adjust = 1
+toolhead_entry_tension_test = 1
+toolhead_move_error_tolerance = 60
+force_form_tip_standalone = 1
+form_tip_macro = _MMU_FORM_TIP
+extruder_form_tip_current = 100
+slicer_tip_park_pos = 0
+force_purge_standalone = 0
+purge_macro = _MMU_PURGE
+extruder_purge_current = 100
+sync_gear_current = 70
+sync_feedback_enabled = 0
+sync_feedback_buffer_range = 6
+sync_feedback_buffer_maxrange = 12
+sync_multiplier_high = 1.05
+sync_multiplier_low = 0.95
+espooler_min_distance = 30
+espooler_max_stepper_speed = 300
+espooler_min_stepper_speed = 0
+espooler_speed_exponent = 0.5
+espooler_assist_reduced_speed = 50
+espooler_printing_power = 0
+espooler_operations = rewind, assist, print
+espooler_assist_extruder_move_length = 100
+espooler_assist_burst_power = 100
+espooler_assist_burst_duration = 0.4
+espooler_assist_burst_trigger = 0
+espooler_assist_burst_trigger_max = 3
+enable_clog_detection = 0
+enable_endless_spool = 1
+endless_spool_on_load = 0
+endless_spool_eject_gate = -1
+spoolman_support = off
+pending_spool_id_timeout = 20
+t_macro_color = slicer
+console_stat_columns = unload, load, post_load, total
+console_stat_rows = total, total_average, job, job_average, last
+console_gate_stat = emoticon
+console_always_output_full = 1
+autocal_bowden_length = 1
+autotune_bowden_length = 1
+skip_cal_rotation_distance = 0
+autotune_rotation_distance = 0
+skip_cal_encoder = 0
+autotune_encoder = 0
+timeout_pause = 72000
+disable_heater = 600
+default_extruder_temp = 200
+extruder_temp_variance = 2
+startup_home_if_unloaded = 0
+startup_reset_ttg_map = 0
+show_error_dialog = 1
+preload_attempts = 5
+strict_filament_recovery = 0
+filament_recovery_on_pause = 1
+retry_tool_change_on_error = 0
+bypass_autoload = 1
+has_filament_buffer = 0
+encoder_move_validation = 1
+print_start_detection = 1
+extruder = extruder
+gcode_load_sequence = 0
+gcode_unload_sequence = 0
+update_trsync = 1
+canbus_comms_retries = 3
+update_bit_max_time = 1
+update_aht10_commands = 0
+pause_macro = PAUSE
+action_changed_macro = _MMU_ACTION_CHANGED
+print_state_changed_macro = _MMU_PRINT_STATE_CHANGED
+mmu_event_macro = _MMU_EVENT
+pre_unload_macro = _MMU_PRE_UNLOAD
+post_form_tip_macro = _MMU_POST_FORM_TIP
+post_unload_macro = _MMU_POST_UNLOAD
+pre_load_macro = _MMU_PRE_LOAD
+post_load_macro = _MMU_POST_LOAD
+unload_sequence_macro = _MMU_UNLOAD_SEQUENCE
+load_sequence_macro = _MMU_LOAD_SEQUENCE
+
+[gcode_macro _MMU_PURGE]
+description = Simple reference filament purge
+gcode = 
+	
+	{% set sequence_vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set retracted_length = park_vars.retracted_length %}
+	{% set retract_speed = sequence_vars.retract_speed|int %}
+	{% set unretract_speed = sequence_vars.unretract_speed|int %}
+	
+	
+	{% set toolchange_purge_volume = printer.mmu.toolchange_purge_volume|default(0)|float %}
+	{% set extruder_filament_remaining = printer.mmu.extruder_filament_remaining|default(0)|float %}
+	
+	
+	
+	{% set pv = printer.mmu.slicer_tool_map.purge_volumes %}
+	
+	
+	{% set filament_diameter = printer.configfile.config.extruder.filament_diameter|float %}
+	{% set filament_cross_section = (filament_diameter / 2) ** 2 * 3.1415 %}
+	{% set purge_len = (toolchange_purge_volume / filament_cross_section) + extruder_filament_remaining %}
+	{% set segment_len = 2.0 %}
+	
+	
+	{% if retracted_length > 0 %}
+	MMU_LOG MSG="Un-retracting {retracted_length}mm"
+	M83
+	G1 E{retracted_length} F{unretract_speed|abs * 60}
+	{% endif %}
+	
+	MMU_LOG MSG="Purging {purge_len | round(1)}mm of filament"
+	
+	
+	{% set num_segments = (purge_len // segment_len) | int %}
+	{% for _ in range(num_segments) %}
+	__MMU_PURGE_SEGMENT LENGTH={segment_len}
+	{% endfor %}
+	__MMU_PURGE_SEGMENT LENGTH={purge_len % segment_len}
+	
+	
+	{% if retracted_length > 0 %}
+	MMU_LOG MSG="Retracting {retracted_length}mm"
+	M83
+	G1 E-{retracted_length} F{retract_speed|abs * 60}
+	{% endif %}
+	
+	MMU_LOG MSG="Purging complete"
+
+[gcode_macro __MMU_PURGE_SEGMENT]
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_PURGE_VARS'] %}
+	{% set extruder_purge_speed = vars['extruder_purge_speed']|float %}
+	{% set length = params.LENGTH|float %}
+	{% set clog_runout_detected = printer.mmu.clog_runout_detected|default(false)|lower == 'true' %}
+	
+	{% if not clog_runout_detected %}
+	G1 E{length} F{extruder_purge_speed * 60}
+	{% endif %}
+
+[gcode_macro _MMU_PARK]
+description = Park toolhead safely away from print
+variable_saved_xyz = 0, 0, 0
+variable_saved_pos = False
+variable_park_operation = ''
+variable_next_xy = 0, 0
+variable_next_pos = False
+variable_min_lifted_z = 0
+variable_toolchange_z = -1
+variable_retracted_length = 0
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set operation = params.OPERATION|default(printer.mmu.operation)|string|lower %}
+	{% set is_printing = printer.mmu.print_state in ["started", "printing"] and not printer.pause_resume.is_paused %}
+	{% set force_park = params.FORCE_PARK|default(0)|int == 1 %}
+	{% set force_park_x = params.X|default(-999)|float %}
+	{% set force_park_y = params.Y|default(-999)|float %}
+	{% set enable_park_printing = (vars.enable_park_printing|default("toolchange,runout,pause,cancel")|string|lower).split(",") %}
+	{% set enable_park_standalone = (vars.enable_park_standalone|default("toolchange,load,unload,pause,cancel")|string|lower).split(",") %}
+	{% set enable_park_disabled = (vars.enable_park_disabled|default("pause,cancel")|string|lower).split(",") %}
+	{% set nx,ny = next_xy|map('float') %}
+	{% set pos = printer.gcode_move.gcode_position %}
+	{% if force_park %}
+	{% set operation = 'force_park' %}
+	{% set x = force_park_x %}
+	{% set y = force_park_y %}
+	{% set park_z_hop = params.Z_HOP|default(0)|float %}
+	{% set z_hop_ramp = params.RAMP|default(0)|float %}
+	{% set retract = 0 %}
+	{% elif operation in ['toolchange','load','unload'] %}
+	{% set x, y, park_z_hop, z_hop_ramp, retract = vars.park_toolchange|default([-999,-999,0,0,0])|map('float') %}
+	{% elif operation in ['runout'] %}
+	{% set x, y, park_z_hop, z_hop_ramp, retract = vars.park_runout|default([-999,-999,0,0,0])|map('float') %}
+	{% elif operation in ['pause'] %}
+	{% set x, y, park_z_hop, z_hop_ramp, retract = vars.park_pause|default([-999,-999,0,0,0])|map('float') %}
+	{% elif operation in ['cancel'] %}
+	{% set x, y, park_z_hop, z_hop_ramp, retract = vars.park_cancel|default([-999,-999,0,0,0])|map('float') %}
+	{% elif operation in ['complete'] %}
+	{% set x, y, park_z_hop, z_hop_ramp, retract = vars.park_complete|default([-999,-999,0,0,0])|map('float') %}
+	{% else %}
+	{% set x = -999 %}
+	{% set y = -999 %}
+	{% set park_z_hop = 0 %}
+	{% set z_hop_ramp = 0 %}
+	{% set retract = 0 %}
+	{% endif %}
+	{% set park_z_hop = park_z_hop|abs %}
+	{% set z_hop_ramp = z_hop_ramp|abs %}
+	{% set min_toolchange_z = vars.min_toolchange_z|default(1)|float|abs %}
+	{% if x == -999 and y == -999 and park_z_hop == 0 %}
+	{% set min_toolchange_z = 0 %}
+	{% endif %}
+	{% set park_travel_speed = vars.park_travel_speed|default(200)|float * 60 %}
+	{% set park_lift_speed = vars.park_lift_speed|default(15)|float * 60 %}
+	{% set pos = printer.gcode_move.gcode_position %}
+	{% set origin = printer.gcode_move.homing_origin %}
+	{% set max = printer.toolhead.axis_maximum %}
+	
+	
+	{% set orig_x = pos.x %}
+	{% set orig_y = pos.y %}
+	{% set cx = (max.x - origin.x) / 2.0 %}
+	{% set cy = (max.y - origin.y) / 2.0 %}
+	{% if pos.x == cx and pos.y == cy %}
+	{% set target_x = 0 %}
+	{% set target_y = 0 %}
+	{% else %}
+	{% set target_x = cx %}
+	{% set target_y = cy %}
+	{% endif %}
+	{% set dx = target_x - pos.x %}
+	{% set dy = target_y - pos.y %}
+	{% set length = (dx * dx + dy * dy) ** 0.5 %}
+	{% set z_hop_x = pos.x + z_hop_ramp * dx / length %}
+	{% set z_hop_y = pos.y + z_hop_ramp * dy / length %}
+	
+	{% set starting_z = saved_xyz[2] if saved_pos else pos.z %}
+	{% set z_hop_floor = [starting_z, min_lifted_z]|max %}
+	{% set toolchange_z = [[z_hop_floor + park_z_hop, max.z - origin.z]|min, min_toolchange_z, toolchange_z]|max %}
+	
+	{% set should_park = force_park or (
+	operation in (
+	enable_park_disabled if not printer.mmu.enabled else
+	(enable_park_printing if is_printing else enable_park_standalone)
+	) and operation != park_operation
+	) %}
+	{% set should_ramp = (
+	should_park and pos.z == starting_z and
+	park_z_hop > 0 and z_hop_ramp > 0 and
+	operation not in ['load'] and is_printing
+	) %}
+	{% set should_retract = (
+	should_park and
+	retracted_length == 0 and retract > 0 and
+	operation not in ['load']
+	) %}
+	
+	{% if should_park %}
+	{% if should_retract %}
+	_MMU_RETRACT LENGTH={retract}
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=toolchange_z VALUE={toolchange_z}
+	{% set lift=" with ramping lift" if should_ramp else "" %}
+	MMU_LOG MSG="Parking toolhead at (x:{x|round(1) if x != -999 else "n/a"}, y:{y|round(1) if y != -999 else "n/a"}, z:{toolchange_z|round(1)}){lift} for {operation} operation"
+	{% if 'xy' not in printer.toolhead.homed_axes %}
+	MMU_LOG MSG="Cannot park because XY not homed"
+	{% else %}
+	G90
+	{% if 'z' not in printer.toolhead.homed_axes %}
+	MMU_LOG MSG="Skipping z_hop move because Z not homed"
+	{% else %}
+	{% if should_ramp %}
+	G1 X{z_hop_x} Y{z_hop_y} Z{toolchange_z} F{park_travel_speed}
+	G1 X{orig_x} Y{orig_y} Z{toolchange_z} F{park_travel_speed}
+	{% else %}
+	G1 Z{toolchange_z} F{park_lift_speed}
+	{% endif %}
+	{% endif %}
+	{% if vars.user_park_move_macro %}
+	{vars.user_park_move_macro} X={x} Y={y} F={park_travel_speed}
+	{% elif x != -999 and y != -999 %}
+	G1 X{x} Y{y} F{park_travel_speed}
+	{% elif x != -999 and y == -999 %}
+	G1 X{x} F{park_travel_speed}
+	{% elif x == -999 and y != -999 %}
+	G1 Y{y} F{park_travel_speed}
+	{% endif %}
+	{% endif %}
+	{% if not force_park %}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=park_operation VALUE=\"{operation}\"
+	{% endif %}
+	{% endif %}
+
+[gcode_macro _MMU_SAVE_POSITION]
+description = Record to toolhead position for return later
+gcode = 
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set pos = printer.gcode_move.gcode_position %}
+	{% set axis_minimum = printer.toolhead.axis_minimum %}
+	{% set axis_maximum = printer.toolhead.axis_maximum %}
+	{% set x = [axis_minimum.x, [axis_maximum.x, pos.x]|min]|max %}
+	{% set y = [axis_minimum.y, [axis_maximum.y, pos.y]|min]|max %}
+	
+	{% if not park_vars.saved_pos and 'xyz' in printer.toolhead.homed_axes %}
+	{% if x != pos.x or y != pos.y %}
+	MMU_LOG MSG="Warning: Klipper reported out of range gcode position (x:{pos.x}, y:{pos.y})! Adjusted to (x:{x}, y:{y}) to prevent move failure" ERROR=1
+	{% endif %}
+	MMU_LOG MSG="Saving toolhead position (x:{x|round(1)}, y:{y|round(1)}, z:{pos.z|round(1)})"
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=saved_xyz VALUE="{x}, {y}, {pos.z}"
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=saved_pos VALUE={True}
+	{% endif %}
+
+[gcode_macro _MMU_RESTORE_POSITION]
+description = Restore saved toolhead position
+gcode = 
+	{% set skip_restore = params.SKIP_RESTORE|default(0)|int %}
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set x,y,z = park_vars.saved_xyz|map('float') %}
+	{% set nx,ny = park_vars.next_xy|map('float') %}
+	{% set park_travel_speed = vars.park_travel_speed|default(200)|float * 60 %}
+	{% set park_lift_speed = vars.park_lift_speed|default(15)|float * 60 %}
+	{% set restore_xy_pos = vars.restore_xy_pos|default('last') %}
+	{% set is_printing = printer.mmu.print_state in ["started", "printing"] and not printer.pause_resume.is_paused %}
+	
+	{% set should_unretract = (
+	park_vars.retracted_length and
+	park_vars.park_operation not in ['unload', 'cancel', 'complete']
+	) %}
+	{% set should_restore_nextxy = (
+	park_vars.next_pos and
+	restore_xy_pos == 'next' and
+	park_vars.park_operation == 'toolchange'
+	) %}
+	{% set should_restore_xy = (
+	park_vars.saved_pos and
+	(restore_xy_pos != 'none' or park_vars.park_operation != 'toolchange')
+	) %}
+	
+	{% if not skip_restore %}
+	G90
+	{% if park_vars.toolchange_z > 0 and park_vars.saved_pos and 'z' in printer.toolhead.homed_axes %}
+	G1 Z{park_vars.toolchange_z} F{park_lift_speed}
+	{% endif %}
+	{% if should_restore_nextxy %}
+	{% if vars.user_park_move_macro %}
+	MMU_LOG MSG="Restoring toolhead position to next pos using {vars.user_park_move_macro} RESTORE=1 (x:{nx|round(1)}, y:{ny|round(1)})"
+	{vars.user_park_move_macro} RESTORE=1 X={nx} Y={ny} F={park_travel_speed}
+	{% else  %}
+	MMU_LOG MSG="Restoring toolhead position to next pos: (x:{nx|round(1)}, y:{ny|round(1)}, z:{z|round(1)})"
+	G1 X{nx} Y{ny} F{park_travel_speed}
+	{% endif %}
+	{% elif should_restore_xy %}
+	{% if vars.user_park_move_macro %}
+	MMU_LOG MSG="Restoring toolhead position to last pos using {vars.user_park_move_macro} RESTORE=1 (x:{x|round(1)}, y:{y|round(1)})"
+	{vars.user_park_move_macro} RESTORE=1 X={x} Y={y} F={park_travel_speed}
+	{% else %}
+	MMU_LOG MSG="Restoring toolhead position to last pos: (x:{x|round(1)}, y:{y|round(1)}, z:{z|round(1)})"
+	G1 X{x} Y{y} F{park_travel_speed}
+	{% endif %}
+	{% elif park_vars.saved_pos %}
+	MMU_LOG MSG="Restoring toolhead position to: (z:{z|round(1)})"
+	{% endif %}
+	{% if park_vars.saved_pos and 'z' in printer.toolhead.homed_axes %}
+	G1 Z{z} F{park_lift_speed}
+	{% endif %}
+	{% else %}
+	MMU_LOG MSG="Skipping restore of toolhead XYZ position"
+	{% endif %}
+	
+	{% if should_unretract %}
+	_MMU_UNRETRACT
+	{% endif %}
+	
+	_MMU_CLEAR_POSITION
+
+[gcode_macro _MMU_RETRACT]
+description = Helper to retract filament
+gcode = 
+	{% set sequence_vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set retracted_length = park_vars.retracted_length %}
+	{% set length = params.LENGTH|default(0)|float|abs %}
+	{% set speed = sequence_vars.retract_speed|int %}
+	{% set length = [length - retracted_length, 0] | max %}
+	
+	{% if printer.extruder.can_extrude %}
+	{% if length > 0 %}
+	MMU_LOG MSG="Retracting {length}mm"
+	M83
+	G1 E-{length} F{speed|abs * 60}
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=retracted_length VALUE={length}
+	{% else %}
+	MMU_LOG MSG="Extruder is not hot enough to retract" DEBUG=1
+	{% endif %}
+
+[gcode_macro _MMU_UNRETRACT]
+description = Helper to extruder filament to undo retract
+gcode = 
+	{% set sequence_vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set length = park_vars.retracted_length %}
+	{% set speed = sequence_vars.unretract_speed|int %}
+	
+	{% if printer.extruder.can_extrude %}
+	{% if length > 0 %}
+	MMU_LOG MSG="Un-retracting {length}mm"
+	M83
+	G1 E{length} F{speed|abs * 60}
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=retracted_length VALUE=0
+	{% else %}
+	MMU_LOG MSG="Extruder is not hot enough to un-retract" DEBUG=1
+	{% endif %}
+
+[gcode_macro _MMU_CLEAR_POSITION]
+description = Clear previously recorded toolhead position
+gcode = 
+	{% set reset = params.RESET|default(0)|int %}
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=saved_pos VALUE={False}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=next_pos VALUE={False}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=toolchange_z VALUE=-1
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=retracted_length VALUE=0
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=park_operation VALUE=\"\"
+	{% if reset %}
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=min_lifted_z VALUE=0
+	{% endif %}
+	MMU_LOG MSG="Clearing saved toolhead position{' and rising toolchange floor' if reset else ''}" DEBUG=1
+
+[gcode_macro _MMU_AUTO_HOME]
+description = Convenience auto homing primarily for testing
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set auto_home = vars.auto_home|default(true)|lower == 'true' %}
+	
+	{% if auto_home and 'xyz' not in printer.toolhead.homed_axes %}
+	MMU_LOG MSG="Automatically homing XYZ before parking toolhead"
+	G28
+	{% endif %}
+
+[gcode_macro MMU_UPDATE_HEIGHT]
+description = Record maximum toolhead height for z-hop base (call on layer change for sequential printing)
+gcode = 
+	{% set height = params.HEIGHT|default(0)|float %}
+	{% set park_vars = printer['gcode_macro _MMU_PARK'] %}
+	{% set max_z = [park_vars.min_lifted_z, printer.gcode_move.gcode_position.z, height]|max %}
+	
+	{% if max_z > park_vars.min_lifted_z %}
+	MMU_LOG MSG="Setting rising toolchange floor to {max_z}" DEBUG=1
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_PARK VARIABLE=min_lifted_z VALUE={max_z}
+
+[gcode_macro _MMU_PRE_UNLOAD]
+description = Optional pre unload routine for filament change
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set x, y, z_hop = vars.pre_unload_position|default([-999,-999,0])|map('float') %}
+	
+	{% if x != -999 or y != -999 or z_hop > 0 %}
+	_MMU_PARK FORCE_PARK=1 X={x} Y={y} Z_HOP={z_hop}
+	{% endif %}
+	{vars.user_pre_unload_extension|default("")}
+
+[gcode_macro _MMU_POST_FORM_TIP]
+description = Optional post tip forming/cutting routing
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set x, y, z_hop = vars.post_form_tip_position|default([-999,-999,0])|map('float') %}
+	
+	{% if x != -999 or y != -999 or z_hop > 0 %}
+	_MMU_PARK FORCE_PARK=1 X={x} Y={y} Z_HOP={z_hop}
+	{% endif %}
+	{vars.user_post_form_tip_extension|default("")}
+
+[gcode_macro _MMU_POST_UNLOAD]
+description = Optional post unload routine for filament change
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	
+	
+	
+	
+	{vars.user_post_unload_extension|default("")}
+
+[gcode_macro _MMU_PRE_LOAD]
+description = Optional pre load routine for filament change
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set x, y, z_hop = vars.pre_load_position|default([-999,-999,0])|map('float') %}
+	
+	{% if x != -999 or y != -999 or z_hop > 0 %}
+	_MMU_PARK FORCE_PARK=1 X={x} Y={y} Z_HOP={z_hop}
+	{% endif %}
+	{vars.user_pre_load_extension|default("")}
+
+[gcode_macro _MMU_POST_LOAD]
+description = Optional post load routine for filament change
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{% set timelapse = vars.timelapse|default(false)|lower == 'true' %}
+	
+	{% if timelapse %}
+	TIMELAPSE_TAKE_FRAME
+	{% endif %}
+	
+	
+	
+	{vars.user_post_load_extension|default("")}
+
+[gcode_macro _MMU_ERROR]
+description = Called when an MMU error occurs
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SEQUENCE_VARS'] %}
+	{vars.user_mmu_error_extension|default("")}
+
+[gcode_macro _MMU_LOAD_SEQUENCE]
+description = Called when MMU is asked to load filament
+gcode = 
+	{% set filament_pos = params.FILAMENT_POS|float %}
+	{% set length = params.LENGTH|float %}
+	{% set full = params.FULL|int %}
+	{% set home_extruder = params.HOME_EXTRUDER|int %}
+	{% set skip_extruder = params.SKIP_EXTRUDER|int %}
+	{% set extruder_only = params.EXTRUDER_ONLY|int %}
+	
+	{% if extruder_only %}
+	_MMU_STEP_LOAD_TOOLHEAD EXTRUDER_ONLY=1
+	
+	{% elif filament_pos >= 7 %}
+	{action_raise_error("Can't load - already in extruder!")}
+	
+	{% else %}
+	{% if filament_pos <= 0 %}
+	_MMU_STEP_LOAD_GATE
+	{% endif %}
+	
+	{% if filament_pos < 4 %}
+	_MMU_STEP_LOAD_BOWDEN LENGTH={length}
+	{% endif %}
+	
+	{% if filament_pos < 6 and home_extruder %}
+	_MMU_STEP_HOME_EXTRUDER
+	{% endif %}
+	
+	{% if not skip_extruder %}
+	_MMU_STEP_LOAD_TOOLHEAD
+	{% endif %}
+	
+	{% endif %}
+
+[gcode_macro _MMU_UNLOAD_SEQUENCE]
+description = Called when MMU is asked to unload filament
+gcode = 
+	{% set filament_pos = params.FILAMENT_POS|float %}
+	{% set length = params.LENGTH|float %}
+	{% set extruder_only = params.EXTRUDER_ONLY|int %}
+	{% set park_pos = params.PARK_POS|float %}
+	
+	{% if extruder_only %}
+	{% if filament_pos >= 7 %}
+	_MMU_STEP_UNLOAD_TOOLHEAD EXTRUDER_ONLY=1 PARK_POS={park_pos}
+	{% else %}
+	{action_raise_error("Can't unload extruder - already unloaded!")}
+	{% endif %}
+	
+	{% elif filament_pos == 0 %}
+	{action_raise_error("Can't unload - already unloaded!")}
+	
+	{% else %}
+	{% if filament_pos >= 7 %}
+	
+	_MMU_STEP_UNLOAD_TOOLHEAD PARK_POS={park_pos}
+	{% endif %}
+	
+	{% if filament_pos >= 4 %}
+	
+	_MMU_STEP_UNLOAD_BOWDEN FULL=1
+	_MMU_STEP_UNLOAD_GATE
+	
+	{% elif filament_pos >= 2 %}
+	
+	_MMU_STEP_UNLOAD_GATE FULL=1
+	{% endif %}
+	
+	{% endif %}
+
+[gcode_macro MMU_START_SETUP]
+description = Called when starting print to setup MMU
+gcode = 
+	{% set initial_tool = params.INITIAL_TOOL|default(0)|int %}
+	{% set total_toolchanges = params.TOTAL_TOOLCHANGES|default(0)|int %}
+	{% set ttg_map = printer.mmu.ttg_map %}
+	{% set gate_fil_names = printer.mmu.gate_filament_name %}
+	{% set gate_colors = printer.mmu.gate_color %}
+	{% set num_gates = ttg_map|length %}
+	{% set referenced_tools = (params.REFERENCED_TOOLS|default("!referenced_tools!")|string).split(",")
+	if (params.REFERENCED_TOOLS and params.REFERENCED_TOOLS != "")
+	else [] %}
+	{% set tool_colors = (params.TOOL_COLORS|default("")|string).split(",")
+	if (params.TOOL_COLORS and params.TOOL_COLORS != "!colors!" and params.TOOL_COLORS != "")
+	else ['000000'] * num_gates %}
+	{% set tool_temps = (params.TOOL_TEMPS|default("")|string).split(",")
+	if (params.TOOL_TEMPS and params.TOOL_TEMPS != "!temperatures!" and params.TOOL_TEMPS != "")
+	else ['0'] * num_gates %}
+	{% set tool_materials = (params.TOOL_MATERIALS|default("")|string).split(",")
+	if (params.TOOL_MATERIALS and params.TOOL_MATERIALS != "!materials!" and params.TOOL_MATERIALS != "")
+	else ['unknown'] * num_gates %}
+	{% set filament_names = (params.FILAMENT_NAMES|default("")|string).split(",")
+	if (params.FILAMENT_NAMES and params.FILAMENT_NAMES != "!filament_names!" and params.FILAMENT_NAMES != "")
+	else [''] * num_gates %}
+	{% set purge_volumes = (params.PURGE_VOLUMES|default("")|string)
+	if (params.PURGE_VOLUMES and params.PURGE_VOLUMES != "!purge_volumes!" and params.PURGE_VOLUMES != "")
+	else "" %}
+	
+	{% set vars = printer['gcode_macro _MMU_SOFTWARE_VARS'] %}
+	{% set home_mmu = vars.home_mmu|lower == 'true' %}
+	
+	{% set filament_loaded = printer.mmu.filament_pos == 10 %}
+	{% set using_bypass = printer.mmu.tool == -2 %}
+	{% set num_colors = referenced_tools|length %}
+	
+	{% if printer.mmu.enabled %}
+	
+	
+	MMU_PRINT_START
+	
+	
+	{% if not vars.user_pre_initialize_extension == "" %}
+	{vars.user_pre_initialize_extension}
+	{% endif %}
+	
+	
+	{% if referenced_tools == ['!referenced_tools!'] %}
+	MMU_LOG MSG="Happy Hare gcode pre-processor is probably disabled or not setup correctly"
+	{% set referenced_tools = [] %}
+	{% set num_colors = -1 %}
+	{% elif referenced_tools == [] %}
+	{% set num_colors = 1 %}
+	{% endif %}
+	
+	
+	{% set num_slicer_tools = tool_colors|length %}
+	{% if not using_bypass %}
+	{% if tool_colors|length != tool_temps|length or tool_colors|length != tool_materials|length or tool_colors|length != filament_names|length %}
+	MMU_LOG MSG="Warning: Slicer defined extruder attributes have different lengths. Possibly an issue with parsing slicer information or missing parameters to MMU_START_SETUP"
+	MMU_LOG MSG="  TOOL_COLORS={tool_colors}"
+	MMU_LOG MSG="  TOOL_TEMPS={tool_temps}"
+	MMU_LOG MSG="  TOOL_MATERIALS={tool_materials}"
+	MMU_LOG MSG="  FILAMENT_NAMES={filament_names}"
+	{% endif %}
+	{% if tool_colors|length != num_gates or tool_temps|length != num_gates or tool_materials|length != num_gates or filament_names|length != num_gates %}
+	{% if vars.automap_strategy != 'none' %}
+	MMU_LOG MSG="Warning: Looks like slicer is setup with {num_slicer_tools} extruders but your MMU has {num_gates} gates! Probably using auto-map feature."
+	{% else %}
+	MMU_LOG MSG="Warning: Looks like slicer is setup with {num_slicer_tools} extruders but your MMU has {num_gates} gates! These should match but will attempt to continue"
+	{% endif %}
+	{% endif %}
+	{% endif %}
+	
+	
+	MMU_SLICER_TOOL_MAP RESET=1 PURGE_VOLUMES={purge_volumes} NUM_SLICER_TOOLS={num_slicer_tools} INITIAL_TOOL={initial_tool} TOTAL_TOOLCHANGES={total_toolchanges}
+	{% if using_bypass %}
+	MMU_SLICER_TOOL_MAP SKIP_AUTOMAP=1
+	{% endif %}
+	{% for t in range(num_slicer_tools) %}
+	MMU_SLICER_TOOL_MAP TOOL={t} TEMP={tool_temps[t]} MATERIAL='{tool_materials[t]}' COLOR={tool_colors[t]} NAME='{filament_names[t]}' {"USED=0" if t|string not in referenced_tools and t != initial_tool else ""} QUIET=1 AUTOMAP={vars.automap_strategy}
+	{% endfor %}
+	
+	
+	{% set custom_msg = [] %}
+	{% set m = [] %}
+	{% for tool in referenced_tools %}
+	{% set _ = m.append("T" + tool|string + " (Gate" + ttg_map[tool|int]|string + ")") %}
+	{% endfor %}
+	{% set line = "Initial Tool: T%s" % initial_tool %}
+	{% set _ = m.append(line) %}
+	{% set _ = custom_msg.append("Print requires tools: %s" % ", ".join(m)) %}
+	{% set _ = custom_msg.append("Manually ensure that T" + initial_tool|string + " is loaded and all other tools available before resuming print") %}
+	
+	
+	{% if num_colors > 1 %}
+	MMU_SLICER_TOOL_MAP SPARSE_PURGE_MAP=1 NUM_SLICER_TOOLS={num_slicer_tools}
+	{% else %}
+	MMU_SLICER_TOOL_MAP
+	{% endif %}
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_ERROR_DIALOG VARIABLE=show_abort VALUE={True}
+	{% if using_bypass and filament_loaded %}
+	MMU_LOG MSG="MMU Bypass selected and loaded"
+	{% if num_colors > 1 %}
+	SET_GCODE_VARIABLE MACRO=_MMU_ERROR_DIALOG VARIABLE=custom_msg VALUE="{custom_msg}"
+	MMU_PAUSE MSG="Bypass selected for multi-color print"
+	{% endif %}
+	{% else %}
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_ERROR_DIALOG VARIABLE=custom_msg VALUE="{custom_msg}"
+	{% if home_mmu %}
+	{% if not filament_loaded %}
+	MMU_HOME TOOL={initial_tool}
+	{% else %}
+	MMU_LOG MSG="Skipping homing MMU because filament is already loaded"
+	{% endif %}
+	{% endif %}
+	{% endif %}
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_setup_run VALUE={True}
+
+[gcode_macro MMU_START_CHECK]
+description = Helper macro. Can be called to perform pre-start checks on MMU based on slicer requirements
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SOFTWARE_VARS'] %}
+	{% set check_gates = vars.check_gates|lower == 'true' %}
+	{% set using_bypass = printer.mmu.tool == -2 %}
+	
+	{% if printer.mmu.enabled %}
+	{% set slicer_tool_map = printer.mmu.slicer_tool_map %}
+	{% set initial_tool = slicer_tool_map.initial_tool %}
+	{% set tools = slicer_tool_map.referenced_tools %}
+	{% if not using_bypass %}
+	
+	
+	{% if check_gates and tools|length > 0 %}
+	
+	MMU_LOG MSG="Checking all required gates have filament loaded..."
+	{% if not printer.mmu.is_homed %}
+	MMU_HOME
+	{% endif %}
+	MMU_CHECK_GATE TOOLS={tools|join(",")}
+	{% endif %}
+	{% endif %}
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_check_run VALUE={True}
+
+[gcode_macro MMU_START_LOAD_INITIAL_TOOL]
+description = Helper to load initial tool if not paused
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_SOFTWARE_VARS'] %}
+	{% set load_initial_tool = vars.load_initial_tool|lower == 'true' %}
+	{% set using_bypass = printer.mmu.tool == -2 %}
+	{% set filament_loaded = printer.mmu.filament_pos == 10 %}
+	{% set slicer_tool_map = printer.mmu.slicer_tool_map %}
+	{% set initial_tool = slicer_tool_map.initial_tool %}
+	{% set tools = slicer_tool_map.referenced_tools %}
+	
+	{% if printer.mmu.enabled %}
+	{% if not using_bypass and tools|length > 0 %}
+	{% if load_initial_tool and (initial_tool is not none and initial_tool >= 0) %}
+	MMU_LOG MSG="Loading initial tool T{initial_tool}..."
+	MMU_CHANGE_TOOL STANDALONE=1 RESTORE=0 TOOL={initial_tool}
+	{% endif %}
+	{% elif not filament_loaded %}
+	MMU_PAUSE MSG="Load bypass or initial tool before resuming print"
+	{% else %}
+	MMU_LOG MSG="Using bypass"
+	{% endif %}
+	{% endif %}
+	
+	
+	SET_GCODE_VARIABLE MACRO=_MMU_ERROR_DIALOG VARIABLE=custom_msg VALUE='""'
+	SET_GCODE_VARIABLE MACRO=_MMU_ERROR_DIALOG VARIABLE=show_abort VALUE={False}
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_load_initial_tool_run VALUE={True}
+
+[gcode_macro MMU_END]
+description = Called when ending print to finalize MMU
+gcode = 
+	{% set unload = params.UNLOAD|default(0)|int %}
+	{% set vars = printer['gcode_macro _MMU_SOFTWARE_VARS'] %}
+	{% set unload_tool = vars.unload_tool|lower == 'true' %}
+	{% set reset_ttg = vars.reset_ttg|lower == 'true' %}
+	{% set dump_stats = vars.dump_stats|lower == 'true' %}
+	{% set slicer_tool_map = printer.mmu.slicer_tool_map %}
+	{% set tools = slicer_tool_map.referenced_tools %}
+	{% set using_bypass = printer.mmu.tool == -2 %}
+	
+	{% if printer.mmu.enabled %}
+	{% if not vars.user_print_end_extension == "" %}
+	{vars.user_print_end_extension}
+	{% endif %}
+	
+	{% if unload or unload_tool %}
+	MMU_LOG MSG="Unloading filament on print end"
+	MMU_UNLOAD RESTORE=0
+	{% endif %}
+	
+	{% if reset_ttg %}
+	MMU_TTG_MAP RESET=1 QUIET=1
+	{% endif %}
+	
+	{% if dump_stats and not using_bypass and tools|length > 0 %}
+	MMU_STATS
+	{% endif %}
+	
+	
+	MMU_PRINT_END STATE=complete
+	{% endif %}
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_end_run VALUE={True}
+
+[gcode_macro MMU_COLD_PULL]
+description = Guide you through the process of cleaning your extruder with a cold pull
+gcode = 
+	{% set material = params.MATERIAL|default("pla")|string|upper %}
+	{% set materials = {
+	'NYLON': {'hot_temp': 260, 'cold_temp': 50, 'pull_temp': 120, 'min_extrude_temp': 190},
+	'PLA':   {'hot_temp': 250, 'cold_temp': 45, 'pull_temp': 100, 'min_extrude_temp': 160},
+	'ABS':   {'hot_temp': 255, 'cold_temp': 50, 'pull_temp': 120, 'min_extrude_temp': 190},
+	'PETG':  {'hot_temp': 250, 'cold_temp': 45, 'pull_temp': 100, 'min_extrude_temp': 180}
+	} %}
+	{% if material not in materials %}
+	{action_raise_error("Unknown material. Valid types are: Nylon, ABS, PLA, PETG")}
+	{% endif %}
+	
+	
+	{% set hot_temp = params.HOT_TEMP|default('')|int %}
+	{% set cold_temp = params.COLD_TEMP|default('')|int %}
+	{% set pull_temp = params.PULL_TEMP|default('')|int %}
+	{% set min_extrude_temp = params.MIN_EXTRUDE_TEMP|default('')|int %}
+	{% set hot_temp = (hot_temp if hot_temp > 0 else materials.get(material).hot_temp)|int %}
+	{% set cold_temp = (cold_temp if cold_temp > 0 else materials.get(material).cold_temp)|int %}
+	{% set pull_temp = (pull_temp if pull_temp > 0 else materials.get(material).pull_temp)|int %}
+	{% set min_extrude_temp = (min_extrude_temp if min_extrude_temp > 0 else materials.get(material).min_extrude_temp)|int %}
+	
+	{% set pull_speed = params.PULL_SPEED|default(10)|int %}
+	{% set clean_length = params.CLEAN_LENGTH|default(25)|int %}
+	{% set extrude_speed = params.EXTRUDE_SPEED|default(1.5)|float %}
+	
+	{% set ns = namespace(stuff_points=[], cool_points=[]) %}
+	
+	{% for temp in range(hot_temp + 1, cold_temp - 1, -1) %}
+	{% if temp % 10 == 0 %}
+	{% if temp > min_extrude_temp %}
+	{% set ns.stuff_points = ns.stuff_points + [temp] %}
+	{% elif temp < min_extrude_temp %}
+	{% set ns.cool_points = ns.cool_points + [temp] %}
+	{% endif %}
+	{% endif %}
+	{% endfor %}
+	
+	MMU_LOG MSG='{"Cold Pull based on %s profile (use MATERIAL= to adjust):" % material}'
+	MMU_LOG MSG='{"pull_temp=%d\u00B0C, hot_temp=%d\u00B0C, min_extruder=%d\u00B0C, cold_temp=%d\u00B0C" % (pull_temp, hot_temp, min_extrude_temp, cold_temp)}'
+	
+	MMU_LOG MSG='{"Heating extruder to %d\u00B0C..." % hot_temp}'
+	SET_HEATER_TEMPERATURE HEATER="extruder" TARGET={hot_temp}
+	TEMPERATURE_WAIT SENSOR="extruder" MINIMUM={hot_temp - 2} MAXIMUM={hot_temp + 2}
+	
+	
+	MMU_LOG MSG="Cleaning nozzle tip with {clean_length}mm of filament"
+	_MMU_STEP_MOVE MOTOR="extruder" MOVE={clean_length} SPEED={extrude_speed} ALLOW_BYPASS=1
+	
+	
+	MMU_LOG MSG="Allowing extruder to cool..."
+	SET_HEATER_TEMPERATURE HEATER="extruder" TARGET={cold_temp}
+	M106 S255
+	
+	
+	{% for temp in ns.stuff_points %}
+	TEMPERATURE_WAIT SENSOR="extruder" MAXIMUM={temp}
+	MMU_LOG MSG='{"> Stuffing nozzle at %d\u00B0C" % temp}'
+	_MMU_STEP_MOVE MOTOR="extruder" MOVE=1 SPEED={extrude_speed} ALLOW_BYPASS=1
+	{% endfor %}
+	
+	
+	MMU_LOG MSG='{"Waiting for extruder to completely cool to %d\u00B0C..." % cold_temp}'
+	{% for temp in ns.cool_points %}
+	TEMPERATURE_WAIT SENSOR="extruder" MAXIMUM={temp}
+	MMU_LOG MSG='{"> Nozzle at %d\u00B0C" % temp}'
+	{% endfor %}
+	TEMPERATURE_WAIT SENSOR="extruder" MAXIMUM={cold_temp}
+	
+	
+	M107
+	MMU_LOG MSG='{"Re-warming extruder to %d\u00B0C" % pull_temp}'
+	SET_HEATER_TEMPERATURE HEATER="extruder" TARGET={pull_temp}
+	
+	
+	TEMPERATURE_WAIT SENSOR="extruder" MINIMUM={pull_temp - 10}
+	MMU_LOG MSG="Get ready to pull..."
+	TEMPERATURE_WAIT SENSOR="extruder" MINIMUM={pull_temp}
+	MMU_LOG MSG=">>>>> PULL NOW <<<<<"
+	
+	
+	_MMU_STEP_MOVE MOTOR="extruder" MOVE=-150 SPEED={pull_speed} ALLOW_BYPASS=1
+	
+	MMU_LOG MSG="Cold pull is successful if you can see the shape of the nozzle at the filament end"
+	MMU_LOG MSG="If not, try again, perhaps with tweaked temperatures"
+	
+	
+	SET_HEATER_TEMPERATURE HEATER="extruder"
+
+[gcode_macro _MMU_ERROR_DIALOG]
+description = Helper to display pause dialog
+variable_custom_msg = ''
+variable_show_abort = False
+gcode = 
+	{% set message = params.MSG|string %}
+	{% set reason = params.REASON|string %}
+	RESPOND TYPE=command MSG="action:prompt_begin Happy Hare Error Notice"
+	RESPOND TYPE=command MSG='{"action:prompt_text %s" % message}'
+	RESPOND TYPE=command MSG='{"action:prompt_text Reason: %s" % reason}'
+	{% if not custom_msg == "" %}
+	{% for line in custom_msg %}
+	RESPOND TYPE=command MSG='{"action:prompt_text %s" % line}'
+	{% endfor %}
+	{% else %}
+	RESPOND TYPE=command MSG="action:prompt_text After fixing, call RESUME to continue printing (MMU_UNLOCK to restore temperature)"
+	{% endif %}
+	RESPOND TYPE=command MSG="action:prompt_button_group_start"
+	{% if show_abort %}
+	RESPOND TYPE=command MSG="action:prompt_button ABORT|CANCEL_PRINT|error"
+	{% endif %}
+	RESPOND TYPE=command MSG="action:prompt_button UNLOCK|MMU_UNLOCK|secondary"
+	RESPOND TYPE=command MSG="action:prompt_button RESUME|RESUME|warning"
+	RESPOND TYPE=command MSG="action:prompt_button_group_end"
+	RESPOND TYPE=command MSG="action:prompt_show"
+	{% set custom_msg = "" %}
+
+[gcode_macro _MMU_RUN_MARKERS]
+variable_mmu_start_setup_run = False
+variable_mmu_start_check_run = False
+variable_mmu_start_load_initial_tool_run = False
+variable_mmu_end_run = False
+gcode = 
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_setup_run VALUE=False
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_check_run VALUE=False
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_start_load_initial_tool_run VALUE=False
+	SET_GCODE_VARIABLE MACRO=_MMU_RUN_MARKERS VARIABLE=mmu_end_run VALUE=False
+
+[gcode_macro MMU__UNLOAD]
+gcode = MMU_UNLOAD
+
+[gcode_macro MMU__EJECT]
+gcode = MMU_EJECT
+
+[gcode_macro MMU__HOME]
+gcode = 
+	{% set tool = params.TOOL|default(0)|int %}
+	{% set force_unload = params.FORCE_UNLOAD|default(0)|int %}
+	MMU_HOME TOOL={tool} FORCE_UNLOAD={force_unload}
+
+[gcode_macro MMU__STATUS]
+gcode = MMU_STATUS
+
+[gcode_macro MMU__MOTORS_OFF]
+gcode = MMU_MOTORS_OFF
+
+[gcode_macro MMU__SERVO]
+gcode = 
+	{% set pos = params.POS|default("up")|string %}
+	MMU_SERVO POS={pos}
+
+[gcode_macro MMU__SELECT_TOOL]
+gcode = 
+	{% set tool = params.TOOL|default(0)|int %}
+	MMU_SELECT TOOL={tool}
+
+[gcode_macro MMU__SELECT_BYPASS]
+gcode = MMU_SELECT_BYPASS
+
+[gcode_macro MMU__LOAD_BYPASS]
+gcode = MMU_LOAD
+
+[gcode_macro MMU__RECOVER]
+gcode = MMU_RECOVER
+
+[gcode_macro MMU__PRELOAD]
+gcode = 
+	MMU_PRELOAD {rawparams}
+
+[gcode_macro MMU__CHECK_GATE]
+gcode = 
+	{% set gate = params.GATE|default(-1)|int %}
+	{% set tool = params.GATE|default(-1)|int %}
+	{% set gates = params.GATE|default('!')|string %}
+	{% set tools = params.GATE|default('!')|string %}
+	MMU_CHECK_GATE GATE={gate} TOOL={tool} GATES={gates} TOOLS={tools}
+
+[gcode_macro MMU_CHANGE_TOOL_STANDALONE]
+description = Convenience macro for inclusion in print_start for initial tool load
+gcode = 
+	MMU_CHANGE_TOOL {rawparams} STANDALONE=1
+
+[gcode_macro MMU_CHECK_GATES]
+description = Alias for updated macro name of MMU_CHECK_GATE
+gcode = 
+	MMU_CHECK_GATE ALL=1
+
+[gcode_macro MMU_REMAP_TTG]
+description = Alias for updated macro name of MMU_TTG_MAP
+gcode = 
+	MMU_TTG_MAP {rawparams}
+
+[gcode_macro MMU_FORM_TIP]
+description = Alias for updated macro name of MMU_TEST_FORM_TIP
+gcode = 
+	MMU_TEST_FORM_TIP {rawparams}
+
+[gcode_macro _MMU_PRINT_START]
+description = Alias for updated macro name of MMU_PRINT_START
+gcode = 
+	MMU_PRINT_START {rawparams}
+
+[gcode_macro _MMU_PRINT_END]
+description = Alias for updated macro name of MMU_PRINT_END
+gcode = 
+	MMU_PRINT_END {rawparams}
+
+[gcode_macro _MMU_UPDATE_HEIGHT]
+description = Alias for updated macro name of MMU_UPDATE_HEIGHT
+gcode = 
+	MMU_UPDATE_HEIGHT {rawparams}
+
+[gcode_macro _MMU_ACTION_CHANGED]
+description = Called when an action has changed
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_STATE_VARS'] %}
+	{% set action = params.ACTION|string %}
+	{% set old_action = params.OLD_ACTION|string %}
+	
+	{% if not vars.user_action_changed_extension == "" %}
+	{vars.user_action_changed_extension} {rawparams}
+	{% endif %}
+
+[gcode_macro _MMU_PRINT_STATE_CHANGED]
+description = Called when print state changes
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_STATE_VARS'] %}
+	{% set state = params.STATE|string %}
+	{% set old_state = params.OLD_STATE|string %}
+	
+	{% if not vars.user_print_state_changed_extension == "" %}
+	{vars.user_print_state_changed_extension} {rawparams}
+	{% endif %}
+
+[gcode_macro _MMU_EVENT]
+description = Called when certain MMU actions occur
+gcode = 
+	{% set vars = printer['gcode_macro _MMU_STATE_VARS'] %}
+	{% set servo_down_limit = vars.servo_down_limit|default(-1)|int %}
+	{% set cutter_blade_limit = vars.cutter_blade_limit|default(-1)|int %}
+	{% set event = params.EVENT|string %}
+	
+	{% if event == "restart" %}
+	MMU_STATS COUNTER=mmu_restarts INCR=1
+	
+	{% set vendor = printer.configfile.config.mmu_machine.mmu_vendor|string|lower %}
+	{% set version = printer.configfile.config.mmu_machine.mmu_version|string|lower %}
+	{% if vendor == "ercf" %}
+	MMU_STATS COUNTER=servo_down LIMIT={servo_down_limit} WARNING="Inspect servo arm for wear/damage"
+	MMU_STATS COUNTER=cutter_blade LIMIT={cutter_blade_limit} WARNING="Inspect/replace filament cutting blade"
+	{% elif vendor == "tradrack" %}
+	MMU_STATS COUNTER=servo_down LIMIT={servo_down_limit} WARNING="Inspect servo mechanism for wear/damage"
+	MMU_STATS COUNTER=cutter_blade LIMIT={cutter_blade_limit} WARNING="Inspect/replace filament cutting blade"
+	{% endif %}
+	
+	{% elif event == "gate_map_changed" %}
+	{% elif event == "filament_gripped" %}
+	MMU_STATS COUNTER=servo_down INCR=1
+	{% elif event == "filament_cut" %}
+	MMU_STATS COUNTER=cutter_blade INCR=1
+	{% endif %}
+	
+	{% if not vars.user_mmu_event_extension == "" %}
+	{vars.user_mmu_event_extension} {rawparams}
+	{% endif %}
+
+[mcu]
+serial = /dev/serial/by-id/usb-Klipper_QIDI_MAIN_V2_1.0.4_2A6132373534350734343539-if00
+restart_method = command
+
+[mcu TH]
+serial = /dev/ttyS4
+restart_method = command
+baud = 500000
+
+[printer]
+kinematics = corexy
+max_velocity = 600
+max_accel = 20000
+max_z_velocity = 20
+max_z_accel = 500
+square_corner_velocity = 8
+
+[resonance_tester]
+accel_per_hz = 150
+max_smoothing = 0.25
+accel_chip = lis2dw
+probe_points = 
+	135, 135, 10
+
+[duplicate_pin_override]
+pins = 
+	TH:PA11
+
+[filament_switch_sensor Entry]
+pause_on_runout = True
+runout_gcode = 
+	M118 Filament run out
+insert_gcode = 
+event_delay = 3.0
+pause_delay = 0.5
+switch_pin = !TH:PA1
+
+[bed_screws]
+screw1 = 30,30
+screw1_name = Front left
+screw2 = 240,30
+screw2_name = Front right
+screw3 = 240,240
+screw3_name = Last right
+screw4 = 30,240
+
+[force_move]
+enable_force_move = True
+
+[tmc2209 extruder]
+uart_pin = TH:PC13
+interpolate = True
+run_current = 0.857
+stealthchop_threshold = 0
+
+[lis2dw]
+cs_pin = TH:PA10
+spi_software_sclk_pin = TH:PA5
+spi_software_mosi_pin = TH:PA7
+spi_software_miso_pin = TH:PA6
+axes_map = y, z, -x
+
+[stepper_x]
+step_pin = PB4
+dir_pin = !PB3
+enable_pin = !PB5
+microsteps = 16
+rotation_distance = 38.82
+full_steps_per_rotation = 200
+endstop_pin = tmc2240_stepper_x:virtual_endstop
+position_min = -1
+position_endstop = 271
+position_max = 275
+homing_speed = 50
+homing_retract_dist = 0
+homing_positive_dir = true
+
+[stepper_y]
+step_pin = PC14
+dir_pin = !PC13
+enable_pin = !PC15
+microsteps = 16
+rotation_distance = 38.82
+full_steps_per_rotation = 200
+endstop_pin = tmc2240_stepper_y:virtual_endstop
+position_min = -1
+position_endstop = -1
+position_max = 295
+homing_speed = 50
+homing_retract_dist = 0
+homing_positive_dir = False
+
+[stepper_z]
+step_pin = PC10
+dir_pin = PA15
+enable_pin = !PC11
+microsteps = 128
+rotation_distance = 4
+full_steps_per_rotation = 200
+endstop_pin = probe:z_virtual_endstop
+position_max = 265
+position_min = -2
+homing_speed = 10
+second_homing_speed = 5
+homing_retract_dist = 10.0
+homing_positive_dir = false
+
+[stepper_z1]
+step_pin = PB1
+dir_pin = PB6
+enable_pin = !PB0
+microsteps = 128
+rotation_distance = 4
+full_steps_per_rotation = 200
+
+[z_tilt]
+z_positions = 
+	-15,137
+	285,137
+points = 
+	10,137
+	260,137
+speed = 150
+horizontal_move_z = 5
+retries = 2
+retry_tolerance = 0.05
+
+[tmc2240 stepper_x]
+spi_software_sclk_pin = PA5
+spi_software_miso_pin = PA6
+spi_software_mosi_pin = PA7
+spi_speed = 200000
+cs_pin = PC12
+diag0_pin = !PB8
+interpolate = true
+run_current = 1.07
+stealthchop_threshold = 0
+driver_sgt = 1
+
+[tmc2240 stepper_y]
+spi_software_sclk_pin = PA5
+spi_software_miso_pin = PA6
+spi_software_mosi_pin = PA7
+spi_speed = 200000
+cs_pin = PD2
+diag0_pin = !PC0
+interpolate = true
+run_current = 1.07
+stealthchop_threshold = 0
+driver_sgt = 1
+
+[tmc2209 stepper_z1]
+uart_pin = PB7
+run_current = 1.07
+interpolate = True
+stealthchop_threshold = 9999999999
+diag_pin = ^PA14
+driver_sgthrs = 140
+
+[tmc2209 stepper_z]
+uart_pin = PC5
+run_current = 1.07
+interpolate = True
+stealthchop_threshold = 9999999999
+diag_pin = ^PC1
+driver_sgthrs = 140
+
+[heater_bed]
+heater_pin = PC7
+sensor_type = NTC 100K MGB18-104F39050L32
+sensor_pin = PA4
+max_power = 1.0
+control = pid
+pid_kp = 71.231
+pid_ki = 1.218
+pid_kd = 1041.758
+pwm_cycle_time = 0.1
+min_temp = -60
+max_temp = 125
+
+[heater_generic chamber]
+heater_pin = PC8
+max_power = 1
+sensor_type = NTC 100K MGB18-104F39050L32
+sensor_pin = PA1
+control = pid
+pid_kp = 63.418
+pid_ki = 1.342
+pid_kd = 749.125
+min_temp = -100
+max_temp = 70
+z_max_limit = 230
+
+[verify_heater chamber]
+max_error = 300
+check_gain_time = 480
+hysteresis = 5
+heating_gain = 1
+
+[temperature_sensor Chamber_Thermal_Protection_Sensor]
+sensor_type = NTC 100K MGB18-104F39050L32
+sensor_pin = PA2
+min_temp = -100
+max_temp = 130
+
+[verify_heater extruder]
+max_error = 120
+check_gain_time = 20
+hysteresis = 2
+heating_gain = 2
+
+[verify_heater heater_bed]
+max_error = 400
+check_gain_time = 120
+hysteresis = 2
+heating_gain = 1
+
+[fan_generic chamber_circulation_fan]
+pin = PA10
+shutdown_speed = 0.0
+cycle_time = 0.0100
+hardware_pwm = false
+kick_start_time = 0.100
+off_below = 0.0
+
+[controller_fan chamber_fan]
+pin = PB14
+max_power = 1.0
+shutdown_speed = 0
+kick_start_time = 0.5
+heater = chamber
+fan_speed = 1.0
+off_below = 0
+tachometer_pin = PC6
+tachometer_ppr = 2
+tachometer_poll_interval = 0.0015
+stepper = 
+
+[heater_fan hotend_fan]
+pin = TH:PA11
+max_power = 1.0
+shutdown_speed = 1.0
+kick_start_time = 0.5
+heater = extruder
+heater_temp = 50.0
+fan_speed = 1.0
+off_below = 0
+tachometer_pin = TH:PA12
+tachometer_ppr = 2
+tachometer_poll_interval = 0.0015
+
+[fan_generic cooling_fan]
+pin = TH:PA8
+max_power = 1.0
+shutdown_speed = 0
+cycle_time = 0.010
+hardware_pwm = False
+kick_start_time = 0.100
+off_below = 0.0
+tachometer_pin = TH:PA9
+tachometer_ppr = 2
+tachometer_poll_interval = 0.0015
+
+[controller_fan board_fan]
+pin = PA9
+max_power = 1.0
+shutdown_speed = 1.0
+cycle_time = 0.01
+fan_speed = 1.0
+stepper = stepper_z,stepper_z1
+
+[fan_generic auxiliary_cooling_fan]
+pin = PB15
+shutdown_speed = 0.0
+cycle_time = 0.0100
+hardware_pwm = false
+kick_start_time = 0.100
+off_below = 0.0
+tachometer_pin = PC4
+tachometer_ppr = 2
+tachometer_poll_interval = 0.0015
+
+[output_pin Polar_cooler]
+pin = PB10
+pwm = false
+shutdown_value = 0
+value = 0
+
+[output_pin beeper]
+pin = PC2
+pwm = false
+shutdown_value = 0
+value = 0
+
+[output_pin caselight]
+pin = PC9
+pwm = false
+shutdown_value = 0
+value = 1
+
+[probe_air]
+sensor_type = c_sensor
+sclk_pin = TH:PB3
+dout_pin = TH:PB4
+voltage = 4.95
+delta_v = 0.08
+z_offset = -0.07
+speed = 5
+lift_speed = 5
+samples = 2
+sample_retract_dist = 3
+samples_result = average
+samples_tolerance = 0.02
+samples_tolerance_retries = 10
+
+[bed_mesh]
+speed = 100
+horizontal_move_z = 5
+mesh_min = 10,10
+mesh_max = 260,260
+probe_count = 6,6
+algorithm = lagrange
+mesh_pps = 2, 2
+
+[exclude_object]
+
+[input_shaper]
+shaper_type_x = 3hump_ei
+shaper_freq_x = 82.4
+shaper_type_y = mzv
+shaper_freq_y = 51.0
+
+[bed_mesh kamp]
+version = 1
+points = 
+	0.171250, 0.113047, 0.042344, 0.001797
+	0.110156, 0.081953, 0.073047, 0.040234
+	0.067969, 0.081797, 0.069297, 0.048281
+	0.066875, 0.079141, 0.076172, 0.065312
+	0.112578, 0.142891, 0.139297, 0.119141
+	0.163750, 0.152500, 0.188906, 0.111719
+x_count = 4
+y_count = 6
+mesh_x_pps = 2
+mesh_y_pps = 2
+algo = lagrange
+tension = 0.2
+min_x = 60.0
+max_x = 210.0
+min_y = 10.0
+max_y = 260.0
+=======================
+MMU: Sharing gear stepper config rotation_distance=13.6 with stepper_mmu_gear_1
+MMU: Sharing gear stepper config gear_ratio=1:1 with stepper_mmu_gear_1
+MMU: Sharing gear stepper config microsteps=16 with stepper_mmu_gear_1
+MMU: Sharing gear stepper config full_steps_per_rotation=200 with stepper_mmu_gear_1
+MMU: Sharing gear stepper config rotation_distance=13.6 with stepper_mmu_gear_2
+MMU: Sharing gear stepper config gear_ratio=1:1 with stepper_mmu_gear_2
+MMU: Sharing gear stepper config microsteps=16 with stepper_mmu_gear_2
+MMU: Sharing gear stepper config full_steps_per_rotation=200 with stepper_mmu_gear_2
+MMU: Sharing gear stepper config rotation_distance=13.6 with stepper_mmu_gear_3
+MMU: Sharing gear stepper config gear_ratio=1:1 with stepper_mmu_gear_3
+MMU: Sharing gear stepper config microsteps=16 with stepper_mmu_gear_3
+MMU: Sharing gear stepper config full_steps_per_rotation=200 with stepper_mmu_gear_3
+Config error
+Traceback (most recent call last):
+  File "/home/mks/klipper/klippy/klippy.py", line 133, in _connect
+    self._read_config()
+  File "/home/mks/klipper/klippy/klippy.py", line 126, in _read_config
+    self.load_object(config, section_config.get_name(), None)
+  File "/home/mks/klipper/klippy/klippy.py", line 115, in load_object
+    self.objects[section] = init_func(config.getsection(section))
+  File "/home/mks/klipper/klippy/extras/mmu_sensors.py", line 392, in load_config
+    return MmuSensors(config)
+  File "/home/mks/klipper/klippy/extras/mmu_sensors.py", line 278, in __init__
+    self._create_mmu_sensor(config, Mmu.SENSOR_EXTRUDER_ENTRY, None, switch_pin, event_delay, insert=True, runout=True)
+  File "/home/mks/klipper/klippy/extras/mmu_sensors.py", line 301, in _create_mmu_sensor
+    if not self._is_empty_pin(switch_pin):
+  File "/home/mks/klipper/klippy/extras/mmu_sensors.py", line 322, in _is_empty_pin
+    pin_params = ppins.parse_pin(switch_pin, can_invert=True, can_pullup=True)
+  File "/home/mks/klipper/klippy/pins.py", line 83, in parse_pin
+    raise error("Unknown pin chip name '%s'" % (chip_name,))
+pins.error: Unknown pin chip name 'THR'
+webhooks client 548637994336: New connection
+webhooks client 548637994336: Client info {'program': 'Moonraker', 'version': '?'}

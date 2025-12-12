@@ -1,0 +1,33 @@
+Starting Klippy...
+Args: ['/home/mks/klipper/klippy/klippy.py', '/home/mks/printer_data/config/printer.cfg', '-I', '/home/mks/printer_data/comms/klippy.serial', '-l', '/home/mks/printer_data/logs/klippy.log', '-a', '/home/mks/printer_data/comms/klippy.sock']
+Git version: 'ee2c2a1-dirty'
+Modified files: Klipper-Adaptive-Meshing-Purging, QD_Q2/access/control/digital_keyboard_close.c, QD_Q2/access/control/digital_keyboard_ok.c, QD_Q2/access/startup/open_box_step1.gif, QD_Q2/access/startup/open_box_step2.gif, QD_Q2/access/startup/open_box_step3.gif, QD_Q2/access/startup/open_box_step4.gif, QD_Q2/access/startup/open_box_step5.gif, QD_Q2/bin/client, crowsnest, (+91 files)
+Branch: main
+Remote: origin
+Tracked URL: git@github.com:53Aries/Q2-Firmware.git
+CPU: 4 core ?
+Python: '3.9.2 (default, Feb 28 2021, 17:03:44) \n[GCC 10.2.1 20210110]'
+Start printer at Mon Dec  8 19:28:39 2025 (1765243719.6 255.9)
+Unhandled exception during connect
+Traceback (most recent call last):
+  File "/home/mks/klipper/klippy/klippy.py", line 135, in _connect
+    box_detect.monitor_serial_devices(self)
+NameError: name 'box_detect' is not defined
+webhooks client 547784149984: New connection
+Starting Klippy...
+Args: ['/home/mks/klipper/klippy/klippy.py', '/home/mks/printer_data/config/printer.cfg', '-I', '/home/mks/printer_data/comms/klippy.serial', '-l', '/home/mks/printer_data/logs/klippy.log', '-a', '/home/mks/printer_data/comms/klippy.sock']
+Git version: 'ee2c2a1-dirty'
+Modified files: Klipper-Adaptive-Meshing-Purging, QD_Q2/access/control/digital_keyboard_close.c, QD_Q2/access/control/digital_keyboard_ok.c, QD_Q2/access/startup/open_box_step1.gif, QD_Q2/access/startup/open_box_step2.gif, QD_Q2/access/startup/open_box_step3.gif, QD_Q2/access/startup/open_box_step4.gif, QD_Q2/access/startup/open_box_step5.gif, QD_Q2/bin/client, crowsnest, (+91 files)
+Branch: main
+Remote: origin
+Tracked URL: git@github.com:53Aries/Q2-Firmware.git
+CPU: 4 core ?
+Python: '3.9.2 (default, Feb 28 2021, 17:03:44) \n[GCC 10.2.1 20210110]'
+Start printer at Mon Dec  8 19:28:43 2025 (1765243723.3 259.6)
+Unhandled exception during connect
+Traceback (most recent call last):
+  File "/home/mks/klipper/klippy/klippy.py", line 135, in _connect
+    box_detect.monitor_serial_devices(self)
+NameError: name 'box_detect' is not defined
+webhooks client 547899706336: New connection
+webhooks client 547899706336: Client info {'program': 'Moonraker', 'version': '?'}
