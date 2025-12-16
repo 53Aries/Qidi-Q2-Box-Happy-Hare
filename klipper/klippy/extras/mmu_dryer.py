@@ -101,6 +101,13 @@ class FilamentDryer:
         # Store original target temperature
         self.original_target = heater.get_status(self.reactor.monotonic())['target']
         
+        # Prevent idle_timeout from interfering with drying
+        # Set a very long timeout or disable it during drying
+        idle_timeout = self.printer.lookup_object('idle_timeout', None)
+        if idle_timeout is not None:
+            # Request that the printer stays active during drying
+            idle_timeout.set_state("Printing")
+        
         # Set new target temperature
         heater.set_temp(temp)
         
@@ -129,6 +136,11 @@ class FilamentDryer:
         # Return heater to original target (usually 0)
         heater = self._get_heater()
         heater.set_temp(self.original_target)
+        
+        # Reset idle_timeout state
+        idle_timeout = self.printer.lookup_object('idle_timeout', None)
+        if idle_timeout is not None:
+            idle_timeout.set_state("Idle")
         
         self.is_drying = False
         self.target_temp = 0

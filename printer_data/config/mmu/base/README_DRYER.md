@@ -13,11 +13,11 @@ A non-blocking filament drying system for Klipper using any heater (like `heater
 ## Installation
 
 1. Ensure the `mmu_dryer.py` file is in your `klipper/klippy/extras/` directory
-2. Add the following to your `printer.cfg` or include the `z_mmu_dryer.cfg` file:
+2. Add the following to your `printer.cfg` or include the `mmu_dryer.cfg` file:
    ```
-   [include mmu/base/z_mmu_dryer.cfg]
+   [include mmu/base/mmu_dryer.cfg]
    ```
-3. **Configure the heater name** in `z_mmu_dryer.cfg` if you're not using `heater_mmu`:
+3. **Configure the heater name** in `mmu_dryer.cfg` if you're not using `heater_mmu`:
    ```ini
    [mmu_dryer]
    heater: heater_mmu  # or heater_box, chamber_heater, etc.
@@ -89,7 +89,7 @@ LIST_DRYER_PRESETS
 
 ### Specifying Your Heater
 
-The dryer works with **any heater** defined in your Klipper config. Edit the `heater:` parameter in `z_mmu_dryer.cfg`:
+The dryer works with **any heater** defined in your Klipper config. Edit the `heater:` parameter in `mmu_dryer.cfg`:
 
 ```ini
 [mmu_dryer]
@@ -106,7 +106,7 @@ The heater must be:
 
 ### Adding Custom Presets
 
-Edit `z_mmu_dryer.cfg` to customize or add presets:
+Edit `mmu_dryer.cfg` to customize or add presets:
 
 ```ini
 [mmu_dryer]
@@ -134,7 +134,7 @@ START_FILAMENT_DRYING PRESET=custom
 
 **Error: "Unable to find heater 'heater_mmu'"**
 - Ensure your heater is properly defined in your config (e.g., `[heater_generic heater_mmu]`)
-- Check that the heater name matches in both the heater config and `z_mmu_dryer.cfg`
+- Check that the heater name matches in both the heater config and `mmu_dryer.cfg`
 - Verify the heater config loads before the dryer config (the 'z_' prefix ensures proper load order)
 
 **Drying cycle doesn't start**
@@ -143,7 +143,7 @@ START_FILAMENT_DRYING PRESET=custom
 - Check Klipper logs for errors
 
 **Want to use a different heater**
-- Edit the `heater:` parameter in `[mmu_dryer]` section of `z_mmu_dryer.cfg`
+- Edit the `heater:` parameter in `[mmu_dryer]` section of `mmu_dryer.cfg`
 - Example: Change `heater: heater_mmu` to `heater: heater_box`
 - The heater must be defined elsewhere in your Klipper config (typically as a `[heater_generic]`)
 
