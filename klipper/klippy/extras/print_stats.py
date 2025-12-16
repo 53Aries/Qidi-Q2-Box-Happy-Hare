@@ -15,16 +15,20 @@ class PrintStats:
         self.gcode.register_command(
             "SET_PRINT_STATS_INFO", self.cmd_SET_PRINT_STATS_INFO,
             desc=self.cmd_SET_PRINT_STATS_INFO_help)
+        printer.register_event_handler("extruder:activate_extruder",
+                                       self._handle_activate_extruder)
+    def _handle_activate_extruder(self):
+        gc_status = self.gcode_move.get_status()
+        self.last_epos = gc_status['position'].e
     def _update_filament_usage(self, eventtime):
         gc_status = self.gcode_move.get_status(eventtime)
         cur_epos = gc_status['position'].e
         self.filament_used += (cur_epos - self.last_epos) \
             / gc_status['extrude_factor']
         self.last_epos = cur_epos
-    def set_current_file(self, filename, plateindex):
+    def set_current_file(self, filename):
         self.reset()
         self.filename = filename
-        self.plateindex = plateindex
     def note_start(self):
         curtime = self.reactor.monotonic()
         if self.print_start_time is None:
@@ -85,7 +89,6 @@ class PrintStats:
             self.info_current_layer = min(current_layer, self.info_total_layer)
     def reset(self):
         self.filename = self.error_message = ""
-        self.plateindex = "1"
         self.state = "standby"
         self.prev_pause_duration = self.last_epos = 0.
         self.filament_used = self.total_duration = 0.
@@ -109,7 +112,6 @@ class PrintStats:
         print_duration = self.total_duration - self.init_duration - time_paused
         return {
             'filename': self.filename,
-            'plateindex': self.plateindex,
             'total_duration': self.total_duration,
             'print_duration': print_duration,
             'filament_used': self.filament_used,
