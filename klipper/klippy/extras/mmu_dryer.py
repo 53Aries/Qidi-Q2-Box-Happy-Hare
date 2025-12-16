@@ -56,18 +56,20 @@ class FilamentDryer:
                                     self.cmd_LIST_DRYER_PRESETS,
                                     desc=self.cmd_LIST_DRYER_PRESETS_help)
         
-        # Register printer event handlers
-        self.printer.register_event_handler("klippy:ready", self._handle_ready)
+        # Note: We don't look up the heater here to avoid load order issues
+        # It will be looked up lazily when first needed
     
-    def _handle_ready(self):
-        # Lookup heater object through the heaters module
-        pheaters = self.printer.lookup_object('heaters')
-        try:
-            self.heater = pheaters.lookup_heater(self.heater_name)
-        except Exception as e:
-            raise self.printer.config_error(
-                "Filament dryer: Unable to find heater '%s': %s" 
-                % (self.heater_name, str(e)))
+    def _get_heater(self):
+        """Lazy lookup of heater to avoid load order issues"""
+        if self.heater is None:
+            pheaters = self.printer.lookup_object('heaters')
+            try:
+                self.heater = pheaters.lookup_heater(self.heater_name)
+            except Exception as e:
+                raise self.gcode.error(
+                    "Filament dryer: Unable to find heater '%s': %s" 
+                    % (self.heater_name, str(e)))
+        return self.heater
     
     def _stop_timer(self):
         if self.timer_handler is not None:
@@ -93,11 +95,14 @@ class FilamentDryer:
         if self.is_drying:
             raise self.gcode.error("Drying cycle already in progress")
         
+        # Get heater (lazy lookup)
+        heater = self._get_heater()
+        
         # Store original target temperature
-        self.original_target = self.heater.get_status(self.reactor.monotonic())['target']
+        self.original_target = heater.get_status(self.reactor.monotonic())['target']
         
         # Set new target temperature
-        self.heater.set_temp(temp)
+        heater.set_temp(temp)
         
         # Setup timer
         self.target_temp = temp
@@ -122,7 +127,8 @@ class FilamentDryer:
         self._stop_timer()
         
         # Return heater to original target (usually 0)
-        self.heater.set_temp(self.original_target)
+        heater = self._get_heater()
+        heater.set_temp(self.original_target)
         
         self.is_drying = False
         self.target_temp = 0
@@ -182,7 +188,8 @@ class FilamentDryer:
         total_hours = self.duration / 3600.0
         progress = (elapsed / self.duration) * 100.0
         
-        heater_status = self.heater.get_status(current_time)
+        heater = self._get_heater()
+        heater_status = heater.get_status(current_time)
         current_temp = heater_status.get('temperature', 0)
         
         gcmd.respond_info(
