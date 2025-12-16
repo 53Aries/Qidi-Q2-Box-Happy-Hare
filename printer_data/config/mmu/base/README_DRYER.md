@@ -54,6 +54,8 @@ START_FILAMENT_DRYING TEMP=50 DURATION=4
 START_FILAMENT_DRYING TEMP=65 DURATION=8
 ```
 
+**Note:** Keep temperatures at or below 65°C for the Qidi Box heater.
+
 ### Control Commands
 
 Stop the current drying cycle:
@@ -77,13 +79,17 @@ LIST_DRYER_PRESETS
 
 ## Default Presets
 
+All presets are configured to stay at or below the Qidi Box maximum temperature of 65°C.
+
 | Filament | Temperature | Duration |
 |----------|-------------|----------|
 | PLA      | 50°C        | 4 hours  |
 | PETG     | 55°C        | 6 hours  |
 | ABS      | 60°C        | 4 hours  |
-| Nylon    | 70°C        | 12 hours |
+| Nylon    | 65°C        | 12 hours |
 | TPU      | 50°C        | 4 hours  |
+
+**Note:** The Qidi Box heater is officially rated for a maximum of 65°C. All presets respect this limit.
 
 ## Configuration
 
@@ -126,9 +132,12 @@ START_FILAMENT_DRYING PRESET=custom
 ## Safety Notes
 
 - The dryer uses your existing heater configuration
+- **Qidi Box Maximum:** The heater is officially rated for 65°C maximum per Qidi specifications
+- All default presets are configured at or below this 65°C limit
 - Ensure your heater is properly configured with appropriate safety limits
 - The system respects the `min_temp`, `max_temp`, and `target_max_temp` settings from your heater configuration
 - When stopping a cycle, the heater returns to its previous target temperature (usually 0)
+- **Custom temperatures:** If using manual mode, keep temperatures at or below 65°C for the Qidi Box
 
 ## Troubleshooting
 
