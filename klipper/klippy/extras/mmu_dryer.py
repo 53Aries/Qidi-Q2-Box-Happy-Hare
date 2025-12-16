@@ -60,9 +60,10 @@ class FilamentDryer:
         self.printer.register_event_handler("klippy:ready", self._handle_ready)
     
     def _handle_ready(self):
-        # Lookup heater object
+        # Lookup heater object through the heaters module
+        pheaters = self.printer.lookup_object('heaters')
         try:
-            self.heater = self.printer.lookup_object(self.heater_name)
+            self.heater = pheaters.lookup_heater(self.heater_name)
         except Exception as e:
             raise self.printer.config_error(
                 "Filament dryer: Unable to find heater '%s': %s" 
