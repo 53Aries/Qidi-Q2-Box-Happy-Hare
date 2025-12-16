@@ -138,6 +138,8 @@ START_FILAMENT_DRYING PRESET=custom
 - The system respects the `min_temp`, `max_temp`, and `target_max_temp` settings from your heater configuration
 - When stopping a cycle, the heater returns to its previous target temperature (usually 0)
 - **Custom temperatures:** If using manual mode, keep temperatures at or below 65°C for the Qidi Box
+- **Manual override protection:** If you manually set the heater target to 0°C during drying, the system will warn you and cancel the cycle if the target remains at 0°C for 10 minutes
+- **User control priority:** The dryer will never override your manual temperature changes for safety reasons
 
 ## Troubleshooting
 
@@ -153,6 +155,11 @@ START_FILAMENT_DRYING PRESET=custom
 
 **Want to use a different heater**
 - Edit the `heater:` parameter in `[mmu_dryer]` section of `mmu_dryer.cfg`
+
+**Drying cycle cancelled unexpectedly**
+- If you manually set the heater target to 0°C during a drying cycle, the system will wait 10 minutes before cancelling
+- This is a safety feature to prevent conflicts with user control
+- If you want to stop drying immediately, use `STOP_FILAMENT_DRYING` instead
 - Example: Change `heater: heater_mmu` to `heater: heater_box`
 - The heater must be defined elsewhere in your Klipper config (typically as a `[heater_generic]`)
 

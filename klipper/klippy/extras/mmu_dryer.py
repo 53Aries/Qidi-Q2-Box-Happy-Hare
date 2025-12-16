@@ -28,6 +28,10 @@ class FilamentDryer:
         self.timer_handler = None
         self.original_target = 0
         
+        # Temperature monitoring for user override detection
+        self.zero_target_detected_time = None
+        self.zero_target_warned = False
+        
         # Load presets from config
         self.presets = {}
         preset_names = config.get('presets', '').split(',')
@@ -76,9 +80,41 @@ class FilamentDryer:
             self.reactor.unregister_timer(self.timer_handler)
             self.timer_handler = None
     
-    def _timer_callback(self, eventtime):
-        if not self.is_drying:
-            return self.reactor.NEVER
+    def # Check if user has manually set heater target to 0
+        heater = self._get_heater()
+        heater_status = heater.get_status(eventtime)
+        current_target = heater_status.get('target', 0)
+        
+        if current_target == 0:
+            # User has set target to 0
+            if self.zero_target_detected_time is None:
+                # First detection - start tracking and warn once
+                self.zero_target_detected_time = eventtime
+                self.zero_target_warned = False
+            
+            # Warn once immediately
+            if not self.zero_target_warned:
+                self.gcode.respond_info(
+                    "WARNING: Heater target set to 0°C during drying cycle. "
+                    "Drying will be cancelled if target remains at 0°C for 10 minutes.")
+                self.zero_target_warned = True
+            
+            # Check if target has been at 0 for 10 minutes (600 seconds)
+            time_at_zero = eventtime - self.zero_target_detected_time
+            if time_at_zero >= 600:
+                # Cancel drying cycle
+                self.gcode.respond_info(
+                    "Drying cycle cancelled: Heater target remained at 0°C for 10 minutes.")
+                self._stop_drying()
+                return self.reactor.NEVER
+        else:
+            # Target is not 0 - reset tracking
+            if self.zero_target_detected_time is not None:
+                # Target was previously 0 but user has set it back
+                self.gcode.respond_info(
+                    "Heater target restored. Drying cycle continuing.")
+            self.zero_target_detected_time = None
+            self.zero_target_warned = False
         
         remaining = self.end_time - eventtime
         
@@ -94,6 +130,9 @@ class FilamentDryer:
             elapsed_hours = (eventtime - self.start_time) / 3600.0
             progress = ((eventtime - self.start_time) / self.duration) * 100.0
             
+            current_temp = heater_statuse) / 3600.0
+            progress = ((eventtime - self.start_time) / self.duration) * 100.0
+            
             heater = self._get_heater()
             current_temp = heater.get_status(eventtime).get('temperature', 0)
             
@@ -101,15 +140,22 @@ class FilamentDryer:
                    "%.1fh elapsed | %.1fh remaining" 
                    % (current_temp, progress, elapsed_hours, remaining_hours))
             self.gcode.run_script_from_command("M118 " + msg)
+         only if user hasn't overridden it
+        heater = self._get_heater()
+        current_target = heater.get_status(self.reactor.monotonic())['target']
         
-        # Continue timer
-        return eventtime + 1.0
-    
-    def _start_drying(self, temp, duration):
-        if self.is_drying:
-            raise self.gcode.error("Drying cycle already in progress")
+        # Only restore original target if current target matches our drying temp
+        # If user has manually changed it, respect their choice
+        if abs(current_target - self.target_temp) < 1.0:
+            heater.set_temp(self.original_target)
         
-        # Get heater (lazy lookup)
+        self.is_drying = False
+        self.target_temp = 0
+        self.duration = 0
+        self.start_time = 0
+        self.end_time = 0
+        self.zero_target_detected_time = None
+        self.zero_target_warned = Falsey lookup)
         heater = self._get_heater()
         
         # Store original target temperature
