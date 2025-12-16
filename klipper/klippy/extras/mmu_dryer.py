@@ -1,7 +1,7 @@
 # Filament Dryer Manager for Happy Hare MMU
 # Provides non-blocking timed drying cycles for filament
 #
-# Copyright (C) 2025
+# Copyright (C) 2025 53Aries
 #
 # This file may be distributed under the terms of the GNU GPLv3 license.
 
