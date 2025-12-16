@@ -80,7 +80,11 @@ class FilamentDryer:
             self.reactor.unregister_timer(self.timer_handler)
             self.timer_handler = None
     
-    def # Check if user has manually set heater target to 0
+    def _timer_callback(self, eventtime):
+        if not self.is_drying:
+            return self.reactor.NEVER
+        
+        # Check if user has manually set heater target to 0
         heater = self._get_heater()
         heater_status = heater.get_status(eventtime)
         current_target = heater_status.get('target', 0)
@@ -130,32 +134,21 @@ class FilamentDryer:
             elapsed_hours = (eventtime - self.start_time) / 3600.0
             progress = ((eventtime - self.start_time) / self.duration) * 100.0
             
-            current_temp = heater_statuse) / 3600.0
-            progress = ((eventtime - self.start_time) / self.duration) * 100.0
-            
-            heater = self._get_heater()
-            current_temp = heater.get_status(eventtime).get('temperature', 0)
+            current_temp = heater_status.get('temperature', 0)
             
             msg = ("Drying: %.1f°C | %.1f%% complete | "
                    "%.1fh elapsed | %.1fh remaining" 
                    % (current_temp, progress, elapsed_hours, remaining_hours))
             self.gcode.run_script_from_command("M118 " + msg)
-         only if user hasn't overridden it
-        heater = self._get_heater()
-        current_target = heater.get_status(self.reactor.monotonic())['target']
         
-        # Only restore original target if current target matches our drying temp
-        # If user has manually changed it, respect their choice
-        if abs(current_target - self.target_temp) < 1.0:
-            heater.set_temp(self.original_target)
+        # Continue timer
+        return eventtime + 1.0
+    
+    def _start_drying(self, temp, duration):
+        if self.is_drying:
+            raise self.gcode.error("Drying cycle already in progress")
         
-        self.is_drying = False
-        self.target_temp = 0
-        self.duration = 0
-        self.start_time = 0
-        self.end_time = 0
-        self.zero_target_detected_time = None
-        self.zero_target_warned = Falsey lookup)
+        # Get heater (lazy lookup)
         heater = self._get_heater()
         
         # Store original target temperature
@@ -186,15 +179,22 @@ class FilamentDryer:
         
         self._stop_timer()
         
-        # Return heater to original target (usually 0)
+        # Return heater to original target (usually 0) only if user hasn't overridden it
         heater = self._get_heater()
-        heater.set_temp(self.original_target)
+        current_target = heater.get_status(self.reactor.monotonic())['target']
+        
+        # Only restore original target if current target matches our drying temp
+        # If user has manually changed it, respect their choice
+        if abs(current_target - self.target_temp) < 1.0:
+            heater.set_temp(self.original_target)
         
         self.is_drying = False
         self.target_temp = 0
         self.duration = 0
         self.start_time = 0
         self.end_time = 0
+        self.zero_target_detected_time = None
+        self.zero_target_warned = False
         
         self.gcode.respond_info("Filament drying stopped")
     
