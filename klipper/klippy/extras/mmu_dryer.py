@@ -88,6 +88,20 @@ class FilamentDryer:
             self._stop_drying()
             return self.reactor.NEVER
         
+        # Send status update every 5 minutes to reset idle timeout and inform user
+        if int(eventtime - self.start_time) % 300 == 0:  # Every 5 minutes
+            remaining_hours = remaining / 3600.0
+            elapsed_hours = (eventtime - self.start_time) / 3600.0
+            progress = ((eventtime - self.start_time) / self.duration) * 100.0
+            
+            heater = self._get_heater()
+            current_temp = heater.get_status(eventtime).get('temperature', 0)
+            
+            msg = ("Drying: %.1f°C | %.1f%% complete | "
+                   "%.1fh elapsed | %.1fh remaining" 
+                   % (current_temp, progress, elapsed_hours, remaining_hours))
+            self.gcode.run_script_from_command("M118 " + msg)
+        
         # Continue timer
         return eventtime + 1.0
     
@@ -100,13 +114,6 @@ class FilamentDryer:
         
         # Store original target temperature
         self.original_target = heater.get_status(self.reactor.monotonic())['target']
-        
-        # Prevent idle_timeout from interfering with drying
-        # Set a very long timeout or disable it during drying
-        idle_timeout = self.printer.lookup_object('idle_timeout', None)
-        if idle_timeout is not None:
-            # Request that the printer stays active during drying
-            idle_timeout.set_state("Printing")
         
         # Set new target temperature
         heater.set_temp(temp)
@@ -136,11 +143,6 @@ class FilamentDryer:
         # Return heater to original target (usually 0)
         heater = self._get_heater()
         heater.set_temp(self.original_target)
-        
-        # Reset idle_timeout state
-        idle_timeout = self.printer.lookup_object('idle_timeout', None)
-        if idle_timeout is not None:
-            idle_timeout.set_state("Idle")
         
         self.is_drying = False
         self.target_temp = 0
